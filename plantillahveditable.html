@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja de vida</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        display: ['Poppins', 'sans-serif'],
+                        serif: ['Merriweather', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary-accent: #0284c7;
+            --heading-bg: #0284c7;
+            --badge-bg: #e0f2fe;
+            --badge-text: #0369a1;
+            --heading-font-size: 11px;
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+        
+        html, body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #334155;
+        }
+
+        .no-print {
+            font-size: 13px !important;
+        }
+
+        /* Dimensiones A4 Rígidas de 1 sola página */
+        .cv-paper {
+            width: 210mm;
+            height: 297mm;
+            max-height: 297mm;
+            background: #ffffff;
+            margin: 0 auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Rejilla de 2 Columnas */
+        .cv-grid {
+            display: grid !important;
+            grid-template-columns: 36% 61% !important;
+            column-gap: 3% !important;
+            flex: 1;
+            height: 100%;
+            align-items: stretch !important;
+            overflow: hidden;
+        }
+
+        /* Distribución Vertical Justificada */
+        .column-box {
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            justify-content: space-between !important;
+            transition: background-color 0.2s ease;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            overflow: hidden;
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        #col-left { font-size: 13px; background-color: #ffffff; }
+        #col-right { font-size: 14px; background-color: #ffffff; }
+
+        /* Adaptación de clases tipográficas */
+        .cv-paper .text-xl { font-size: 1.3em !important; }
+        .cv-paper .text-xs { font-size: 0.8em !important; }
+        .cv-paper .text-\[0\.68rem\] { font-size: 0.72em !important; }
+        .cv-paper .text-\[0\.65rem\] { font-size: 0.68em !important; }
+        .cv-paper .text-\[0\.62rem\] { font-size: 0.65em !important; }
+        .cv-paper .text-\[0\.6rem\] { font-size: 0.63em !important; }
+        .cv-paper .text-\[0\.58rem\] { font-size: 0.60em !important; }
+        .cv-paper .text-\[0\.52rem\] { font-size: 0.55em !important; }
+
+        /* Edición interactiva */
+        [contenteditable="true"] {
+            transition: all 0.15s ease-in-out;
+            border-radius: 4px;
+            padding: 1px 3px;
+            margin: -1px -3px;
+        }
+        [contenteditable="true"]:hover {
+            outline: 1.5px dashed var(--primary-accent);
+            background-color: rgba(224, 242, 254, 0.4);
+        }
+        [contenteditable="true"]:focus {
+            outline: 2px solid var(--primary-accent);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .editable-item { position: relative; }
+        .item-actions { opacity: 0; transition: opacity 0.2s ease; }
+        .editable-item:hover .item-actions { opacity: 1; }
+
+        .accent-color { color: var(--primary-accent); }
+        .accent-bg { background-color: var(--primary-accent); }
+        .accent-badge { background-color: var(--badge-bg); color: var(--badge-text); }
+
+        /* Encabezados con tamaño de fuente global editable */
+        .section-header {
+            background-color: var(--heading-bg);
+            color: #ffffff;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: var(--heading-font-size, 11px) !important;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Foto Fija con Control Interno */
+        #photo-wrapper {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            transition: border-radius 0.2s ease;
+        }
+        #profile-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform-origin: center center;
+        }
+
+        /* Impresión A4 Exacta */
+        @media print {
+            html, body {
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .no-print { display: none !important; }
+            .cv-paper {
+                box-shadow: none !important;
+                border: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 0.5cm 0.7cm !important;
+                overflow: hidden !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            .cv-grid {
+                display: grid !important;
+                grid-template-columns: 36% 61% !important;
+                column-gap: 3% !important;
+                height: 100% !important;
+            }
+            .column-box {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            [contenteditable="true"] {
+                outline: none !important;
+                background-color: transparent !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .section-header {
+                background-color: var(--heading-bg) !important;
+                color: #ffffff !important;
+                font-size: var(--heading-font-size, 11px) !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+    </style>
+</head>
+    <div class="hidden md:flex flex-wrap gap-[10px] text-[9px] p-5 font-sans bg-[#f8f9fa] border border-[#e9ecef] rounded-[12px] max-w-[58%] select-none justify-self-center my-5 mx-5" 
+     onclick="if(event.target.tagName === 'SPAN') { 
+    navigator.clipboard.writeText(event.target.innerText.trim()); 
+    const el = event.target; 
+    const originalBg = el.style.background; 
+    el.style.background = '#d1e7dd'; 
+    setTimeout(() => el.style.background = originalBg, 300); 
+  }">
+  
+  <div class="text-[#000000] text-[15px] w-100 mb-[5px]">Iconos personalizados para tus textos, click para copiar.</div>
+
+  <!-- Contacto e Información Personal -->
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📞</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📱</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">✉️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📧</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📍</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🌐</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">👤</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🆔</span>
+
+  <!-- Educación, Títulos y Grados -->
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎓</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📜</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📚</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏫</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📖</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏅</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎖️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📝</span>
+
+  <!-- Experiencia Laboral y Organización -->
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">💼</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏢</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📋</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🗓️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">⌛</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎯</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏆</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🤝</span>
+
+  <!-- Áreas Profesionales y Habilidades -->
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">💻</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🖥️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">⚙️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🛠️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📊</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📈</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎨</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🩺</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">⚖️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">✍️</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🔬</span>
+  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🗣️</span>
+</div>
+    <!-- BARRA SUPERIOR DE HERRAMIENTAS Y CONTROLES -->
+    <div class="no-print max-w-[210mm] mx-auto mb-4 bg-slate-900 text-white p-3.5 rounded-xl shadow-2xl border border-slate-700 flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center gap-2.5">
+            <div class="bg-sky-600 text-white p-2 rounded-lg text-xs font-bold shadow-sm">
+                <i class="fa-solid fa-sliders"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-xs leading-tight text-slate-100">Panel de Control CV</h1>
+                <p class="text-[11px] text-slate-400">Edición</p>
+            </div>
+        </div>
+
+        <!-- BOTÓN: EXPORTAR ARCHIVO HTML -->
+        <button onclick="exportHTMLFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-md flex items-center gap-1.5" title="Guardar una copia de este archivo editable para llevar a otra PC">
+            <i class="fa-solid fa-download"></i> Guardar cambios (.html)
+        </button>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <!-- Tamaños de Letra Texto -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1">
+                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-font text-sky-400 mr-1"></i>Izq:</span>
+                <select onchange="setColumnFontSize('col-left', this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
+                    <option value="11">11px</option>
+                    <option value="12">12px</option>
+                    <option value="13">13px</option>
+                    <option value="14">14px</option>
+                    <option value="16">16px</option>
+                    <option value="18" selected>18px</option>
+                    <option value="20">20px</option>
+                    <option value="22">22px</option>
+                    <option value="24">24px</option>
+                    <option value="26">26px</option>
+                    
+                </select>
+                <span class="text-[11px] text-slate-400 px-1 font-medium">Der:</span>
+                <select onchange="setColumnFontSize('col-right', this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
+                    <option value="11">11px</option>
+                    <option value="12">12px</option>
+                    <option value="13">13px</option>
+                    <option value="14">14px</option>
+                    <option value="15">15px</option>
+                    <option value="16">16px</option>
+                    <option value="18" selected>18px</option>
+                    <option value="20">20px</option>
+                    <option value="22">22px</option>
+                    <option value="24">24px</option>
+                    <option value="26">26px</option>
+                </select>
+            </div>
+
+            <!-- CONTROL PARA TAMAÑO DE TÍTULOS -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
+                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-heading text-sky-400 mr-1"></i>Títulos:</span>
+                <select onchange="setHeadingFontSize(this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-2 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
+                    <option value="9">9 px</option>
+                    <option value="10">10 px</option>
+                    <option value="11">11 px</option>
+                    <option value="12">12 px</option>
+                    <option value="13">13 px</option>
+                    <option value="14">14 px</option>
+                    <option value="15">15 px</option>
+                    <option value="16">16px</option>
+                    <option value="18">18px</option>
+                    <option value="20" selected>20px</option>
+                    <option value="22">22px</option>
+                    <option value="24">24px</option>
+                    <option value="26">26px</option>
+                </select>
+            </div>
+
+            <!-- BOTONES PARA AGREGAR NUEVA SECCIÓN PERSONALIZADA -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1">
+                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-plus-circle text-sky-400 mr-1"></i>Sección:</span>
+                <button onclick="addCustomSection('col-left')" class="bg-slate-900 hover:bg-slate-700 text-sky-400 text-xs font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Agregar sección en la izquierda">
+                    + Izq
+                </button>
+                <button onclick="addCustomSection('col-right')" class="bg-slate-900 hover:bg-slate-700 text-sky-400 text-xs font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Agregar sección en la derecha">
+                    + Der
+                </button>
+            </div>
+
+            <!-- CONTROLES DE COLOR DE FONDO DE COLUMNAS -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
+                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-fill-drip text-sky-400 mr-1"></i>Fondo:</span>
+                <div class="flex items-center gap-1" title="Color fondo columna izquierda">
+                    <span class="text-[10px] text-slate-400">Izq</span>
+                    <input type="color" value="#ffffff" onchange="setColumnBgColor('col-left', this.value)" class="w-5 h-5 rounded cursor-pointer border-0 bg-transparent">
+                </div>
+                <div class="flex items-center gap-1" title="Color fondo columna derecha">
+                    <span class="text-[10px] text-slate-400">Der</span>
+                    <input type="color" value="#ffffff" onchange="setColumnBgColor('col-right', this.value)" class="w-5 h-5 rounded cursor-pointer border-0 bg-transparent">
+                </div>
+            </div>
+
+            <!-- CONTROLES DE FOTO (MARCO, RADIO, ZOOM Y EJE Y) -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-2">
+                <div class="flex items-center gap-1" title="Tamaño del marco">
+                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-circle-dot text-sky-400 mr-1"></i>Marco:</span>
+                    <input type="range" min="60" max="250" value="85" oninput="setPhotoSize(this.value)" class="w-12 accent-sky-500 cursor-pointer">
+                </div>
+                <div class="flex items-center gap-1" title="Redondeo / Radio de la foto">
+                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-icons text-sky-400 mr-1"></i>Radio:</span>
+                    <input type="range" min="0" max="50" value="50" oninput="setPhotoRadius(this.value)" class="w-12 accent-sky-500 cursor-pointer">
+                </div>
+                <div class="flex items-center gap-1" title="Zoom dentro del marco">
+                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-magnifying-glass-plus text-sky-400 mr-1"></i>Zoom:</span>
+                    <input type="range" min="1" max="5.0" step="0.05" value="1" oninput="setPhotoZoom(this.value)" class="w-12 accent-sky-500 cursor-pointer">
+                </div>
+                <div class="flex items-center gap-1" title="Mover foto arriba/abajo">
+                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-arrows-up-down text-sky-400 mr-1"></i>Eje Y:</span>
+                    <input type="range" min="0" max="100" value="50" oninput="setPhotoPosY(this.value)" class="w-12 accent-sky-500 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- COLOR DE ACENTO -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
+                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-palette text-sky-400 mr-1"></i>Acento:</span>
+                <input type="color" value="#0284c7" onchange="setCustomAccentColor(this.value)" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent">
+            </div>
+
+            <!-- ACCIONES -->
+            <button onclick="triggerPhotoUpload()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1">
+                <i class="fa-solid fa-camera text-sky-400"></i> Cambiar
+            </button>
+            <input type="file" id="photo-file-input" class="hidden" accept="image/*" onchange="loadPhotoFromFile(event)">
+
+            <button onclick="window.print()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-md flex items-center gap-1.5">
+                <i class="fa-solid fa-file-pdf"></i> Imprimir / PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- DOCUMENTO A4 IMPRIMIBLE -->
+    <main class="cv-paper p-5 text-slate-800">
+        
+        <div class="cv-grid">
+            
+            <!-- COLUMNA IZQUIERDA -->
+            <aside id="col-left" class="column-box py-1">
+                
+                <!-- FOTO E IDENTIDAD -->
+                <div class="text-center pb-1 border-b border-slate-200">
+                    <div class="relative group inline-block mb-1">
+                        <div id="photo-wrapper" class="border-2 border-slate-300 shadow-sm bg-slate-100">
+                            <img id="profile-img" 
+                                 src="https://images.unsplash.com/photo-1594824813566-7885a39644d6?w=400&auto=format&fit=crop&q=80" 
+                                 alt="Foto de Perfil">
+                        </div>
+                        <button onclick="triggerPhotoUpload()" class="no-print absolute bottom-0 right-0 bg-slate-900 text-white p-1 rounded-full shadow-lg hover:bg-sky-600 transition text-[10px]" title="Cambiar foto">
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                    </div>
+                    
+                    <h1 contenteditable="true" spellcheck="false" class="font-display font-extrabold text-xl tracking-tight text-slate-900 uppercase leading-tight">
+                        Nombres<br><span class="accent-color">Apellidos</span>
+                    </h1>
+                    
+                    <div class="inline-flex items-center gap-1.5 accent-badge font-bold px-2 py-0.5 rounded-full text-[0.65rem] shadow-sm mt-0.5">
+                        <span contenteditable="true" spellcheck="false">🩺 PROFESION</span>
+                    </div>
+                </div>
+
+                <!-- CONTACTO -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">📌 CONTACTO</span>
+                    </div>
+                    <ul class="space-y-2 text-xs">
+                        <li>
+                            <span contenteditable="true" spellcheck="false" class="block font-bold text-slate-500 uppercase break-all tracking-wider my-1">📧 CORREO</span>
+                            <span contenteditable="true" spellcheck="false" class="font-semibold text-slate-800 break-all">jperez@gmail.com</span>
+                        </li>
+                        <li>
+                            <span contenteditable="true" spellcheck="false" class="block font-bold text-slate-500 uppercase break-all tracking-wider my-1">💬 TELÉFONO</span>
+                            <span contenteditable="true" spellcheck="false" class="font-semibold text-slate-800">+xx xxx xxx xxxx</span>
+                        </li>
+                        <li>
+                            <span contenteditable="true" spellcheck="false" class="block font-bold text-slate-500 uppercase break-all tracking-wider my-1">📍 DIRECCIÓN</span>
+                            <span contenteditable="true" spellcheck="false" class="font-semibold text-slate-800 leading-snug">Cra 1AW #19-47 Barrio, CIUDAD, DTO/ESTADO, PAIS</span>
+                        </li>
+                        <li>
+                            <span contenteditable="true" spellcheck="false" class="block font-bold text-slate-500 uppercase break-all tracking-wider my-1">🆔 CÉDULA</span>
+                            <span contenteditable="true" spellcheck="false" class="font-semibold text-slate-800">TIPO ID xxxxxxxxx</span>
+                        </li>
+                        <li>
+                            <span contenteditable="true" spellcheck="false" class="block font-bold text-slate-500 uppercase break-all tracking-wider my-1">🎂 NACIMIENTO</span>
+                            <span contenteditable="true" spellcheck="false" class="font-semibold text-slate-800">Dia / Mes / Año</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PERFIL -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">✨ PERFIL PROFESIONAL</span>
+                    </div>
+                    <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-700 leading-snug text-justify">
+                        Persona responsable, amable y respetuosa, en constante proceso de mejorar mis habilidades y conocimientos. Poseo capacidad de trabajo en equipo, compromiso y excelentes relaciones interpersonales. Deseo adquirir nuevas experiencias en mi labor.
+                    </p>
+                </div>
+
+                <!-- HABILIDADES -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">⚡ HABILIDADES</span>
+                        <button onclick="addSkill()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                    </div>
+                    <ul id="skills-list" class="space-y-0.5 text-xs text-slate-800 font-medium">
+                        <li class="editable-item flex items-center justify-between group">
+                            <span contenteditable="true" spellcheck="false">🧠 Pensamiento crítico</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem] px-1"><i class="fa-solid fa-trash"></i></button>
+                        </li>
+                        <li class="editable-item flex items-center justify-between group">
+                            <span contenteditable="true" spellcheck="false">📊 Microsoft Office 365</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem] px-1"><i class="fa-solid fa-trash"></i></button>
+                        </li>
+                        <li class="editable-item flex items-center justify-between group">
+                            <span contenteditable="true" spellcheck="false">🤝 Profesionalismo y ética</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem] px-1"><i class="fa-solid fa-trash"></i></button>
+                        </li>
+                        <li class="editable-item flex items-center justify-between group">
+                            <span contenteditable="true" spellcheck="false">🔍 Atención al detalle</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem] px-1"><i class="fa-solid fa-trash"></i></button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- INTERESES -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">🌱 INTERESES</span>
+                        <button onclick="addInterest()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                    </div>
+                    <div id="interests-list" class="flex flex-wrap gap-1 text-xs font-medium">
+                        <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-800 px-2 py-0.5 rounded-full">
+                            <span contenteditable="true" spellcheck="false">📚 Estudiar</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-800 px-2 py-0.5 rounded-full">
+                            <span contenteditable="true" spellcheck="false">📈 Negocios</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-800 px-2 py-0.5 rounded-full">
+                            <span contenteditable="true" spellcheck="false">🏃‍♀️ Deporte</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+
+            <!-- COLUMNA DERECHA -->
+            <section id="col-right" class="column-box py-1">
+                
+                <!-- EXPERIENCIA -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">💼 EXPERIENCIA PROFESIONAL</span>
+                        <button onclick="addExperience()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                    </div>
+
+                    <div id="experience-container" class="space-y-1">
+                        <div class="editable-item group relative">
+                            <div class="flex justify-between items-baseline pr-5">
+                                <h3 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-xs">Cargo</h3>
+                                <span contenteditable="true" spellcheck="false" class="text-[0.6rem] font-bold text-slate-600 bg-slate-100 px-1 py-0.2 rounded border border-slate-200">FECHA</span>
+                            </div>
+                            <p contenteditable="true" spellcheck="false" class="text-xs font-semibold accent-color">Empresa</p>
+                            <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-600 leading-snug">
+                                Descripcion
+                            </p>
+                            <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+
+                        <div class="editable-item group relative">
+                            <div class="flex justify-between items-baseline pr-5">
+                                <h3 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-xs">Cargo</h3>
+                                <span contenteditable="true" spellcheck="false" class="text-[0.6rem] font-bold text-slate-600 bg-slate-100 px-1 py-0.2 rounded border border-slate-200">FECHA</span>
+                            </div>
+                            <p contenteditable="true" spellcheck="false" class="text-xs font-semibold accent-color">Empresa</p>
+                            <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-600 leading-snug">
+                                Descripcion
+                            </p>
+                            <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+
+                        <div class="editable-item group relative">
+                            <div class="flex justify-between items-baseline pr-5">
+                                <h3 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-xs">Cargo</h3>
+                                <span contenteditable="true" spellcheck="false" class="text-[0.6rem] font-bold text-slate-600 bg-slate-100 px-1 py-0.2 rounded border border-slate-200">FECHA</span>
+                            </div>
+                            <p contenteditable="true" spellcheck="false" class="text-xs font-semibold accent-color">Empresa</p>
+                            <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-600 leading-snug">
+                                Descripcion
+                            </p>
+                            <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EDUCACIÓN -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">🎓 EDUCACIÓN FORMATIVA</span>
+                        <button onclick="addEducation()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                    </div>
+
+                    <div id="education-container" class="space-y-1">
+                        <div class="editable-item group relative pr-5">
+                            <div class="flex justify-between items-baseline">
+                                <h3 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-xs">Titulo</h3>
+                                <span contenteditable="true" spellcheck="false" class="text-[0.6rem] font-bold text-slate-600">2023</span>
+                            </div>
+                            <p contenteditable="true" spellcheck="false" class="text-xs text-slate-600">Institucion</p>
+                            <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CURSOS -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">📜 CURSOS Y CERTIFICACIONES</span>
+                        <button onclick="addCourse()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                    </div>
+                    <div id="courses-list" class="flex flex-wrap gap-1 text-xs font-medium text-slate-800">
+                        <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded-md">
+                            <span contenteditable="true" spellcheck="false">❤️ Nombre certificado</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded-md">
+                            <span contenteditable="true" spellcheck="false">💻 Nombre certificado</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded-md">
+                            <span contenteditable="true" spellcheck="false">🛡️ Nombre certificado</span>
+                            <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REFERENCIAS -->
+                <div>
+                    <div class="section-header">
+                        <span contenteditable="true" spellcheck="false">👥 REFERENCIAS LABORALES Y PERSONALES</span>
+                        <button onclick="addReference()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                    </div>
+                    <div id="references-container" class="grid grid-cols-2 gap-2">
+                        <div class="editable-item group relative bg-slate-50 p-1.5 rounded border border-slate-200">
+                            <h4 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-[0.72rem]">Nombre</h4>
+                            <p contenteditable="true" spellcheck="false" class="text-[0.62rem] text-slate-600">Cargo</p>
+                            <p contenteditable="true" spellcheck="false" class="text-[0.62rem] font-semibold accent-color">Tel: +xx xxx xxx xxxx</p>
+                            <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0.5 right-0.5 text-red-500 hover:text-red-700 text-[0.6rem]"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+
+                        <div class="editable-item group relative bg-slate-50 p-1.5 rounded border border-slate-200">
+                            <h4 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-[0.72rem]">Nombre</h4>
+                            <p contenteditable="true" spellcheck="false" class="text-[0.62rem] text-slate-600">Cargo</p>
+                            <p contenteditable="true" spellcheck="false" class="text-[0.62rem] font-semibold accent-color">Tel: +xx xxx xxx xxxx</p>
+                            <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0.5 right-0.5 text-red-500 hover:text-red-700 text-[0.6rem]"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- JAVASCRIPT DE FUNCIONALIDADES -->
+    <script>
+        let currentPhotoScale = 1;
+        let currentPhotoPosY = 50;
+
+        function updatePhotoTransform() {
+            const img = document.getElementById('profile-img');
+            if (img) {
+                img.style.transform = `scale(${currentPhotoScale})`;
+                img.style.objectPosition = `50% ${currentPhotoPosY}%`;
+            }
+        }
+
+        function setPhotoSize(sizePx) {
+            const wrapper = document.getElementById('photo-wrapper');
+            if (wrapper) {
+                wrapper.style.width = sizePx + 'px';
+                wrapper.style.height = sizePx + 'px';
+            }
+        }
+
+        function setPhotoRadius(val) {
+            const wrapper = document.getElementById('photo-wrapper');
+            if (wrapper) {
+                wrapper.style.borderRadius = val + '%';
+            }
+        }
+
+        function setPhotoZoom(val) {
+            currentPhotoScale = val;
+            updatePhotoTransform();
+        }
+
+        function setPhotoPosY(val) {
+            currentPhotoPosY = val;
+            updatePhotoTransform();
+        }
+
+        function setColumnFontSize(colId, sizePx) {
+            document.getElementById(colId).style.fontSize = sizePx + 'px';
+        }
+
+        function setHeadingFontSize(sizePx) {
+            document.documentElement.style.setProperty('--heading-font-size', sizePx + 'px');
+        }
+
+        function setColumnBgColor(colId, color) {
+            document.getElementById(colId).style.backgroundColor = color;
+        }
+
+        function setCustomAccentColor(color) {
+            document.documentElement.style.setProperty('--primary-accent', color);
+            document.documentElement.style.setProperty('--heading-bg', color);
+        }
+
+        function triggerPhotoUpload() {
+            document.getElementById('photo-file-input').click();
+        }
+
+        function loadPhotoFromFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-img').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function deleteItem(btn) {
+            const item = btn.closest('.editable-item');
+            if (item) item.remove();
+        }
+
+        function addCustomSection(columnId) {
+            const column = document.getElementById(columnId);
+            const newSection = document.createElement('div');
+            newSection.className = 'editable-item group relative';
+            newSection.innerHTML = `
+                <div class="section-header">
+                    <span contenteditable="true" spellcheck="false">⭐ NUEVA SECCIÓN</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="addCustomSubItem(this)" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                        <button onclick="deleteItem(this)" class="no-print item-actions text-red-200 hover:text-white text-[0.58rem] px-1" title="Eliminar sección completa"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="custom-content space-y-1">
+                    <div class="editable-item group relative">
+                        <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-700 leading-snug">
+                            Escribe aquí el contenido de tu nueva sección personalizada. Puedes hacer clic en el título para cambiarle el nombre.
+                        </p>
+                        <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+            column.appendChild(newSection);
+        }
+
+        function addCustomSubItem(btn) {
+            const container = btn.closest('.editable-item').querySelector('.custom-content');
+            const newItem = document.createElement('div');
+            newItem.className = 'editable-item group relative';
+            newItem.innerHTML = `
+                <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-700 leading-snug">
+                    Nuevo elemento editable...
+                </p>
+                <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function addSkill() {
+            const list = document.getElementById('skills-list');
+            const newItem = document.createElement('li');
+            newItem.className = 'editable-item flex items-center justify-between group';
+            newItem.innerHTML = `
+                <span contenteditable="true" spellcheck="false">✨ Nueva habilidad</span>
+                <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem] px-1"><i class="fa-solid fa-trash"></i></button>
+            `;
+            list.appendChild(newItem);
+        }
+
+        function addInterest() {
+            const list = document.getElementById('interests-list');
+            const newItem = document.createElement('div');
+            newItem.className = 'editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-800 px-2 py-0.5 rounded-full';
+            newItem.innerHTML = `
+                <span contenteditable="true" spellcheck="false">📌 Nuevo interés</span>
+                <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            list.appendChild(newItem);
+        }
+
+        function addExperience() {
+            const container = document.getElementById('experience-container');
+            const newItem = document.createElement('div');
+            newItem.className = 'editable-item group relative';
+            newItem.innerHTML = `
+                <div class="flex justify-between items-baseline pr-5">
+                    <h3 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-xs">Nuevo Cargo</h3>
+                    <span contenteditable="true" spellcheck="false" class="text-[0.6rem] font-bold text-slate-600 bg-slate-100 px-1 py-0.2 rounded border border-slate-200">Año - Año</span>
+                </div>
+                <p contenteditable="true" spellcheck="false" class="text-xs font-semibold accent-color">Nombre Empresa u Hospital</p>
+                <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-600 leading-snug">
+                    Descripción breve de responsabilidades y logros.
+                </p>
+                <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function addEducation() {
+            const container = document.getElementById('education-container');
+            const newItem = document.createElement('div');
+            newItem.className = 'editable-item group relative pr-5';
+            newItem.innerHTML = `
+                <div class="flex justify-between items-baseline">
+                    <h3 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-xs">Título / Carrera</h3>
+                    <span contenteditable="true" spellcheck="false" class="text-[0.6rem] font-bold text-slate-600">Año</span>
+                </div>
+                <p contenteditable="true" spellcheck="false" class="text-xs text-slate-600">Institución o Universidad</p>
+                <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(newItem);
+        }
+
+        function addCourse() {
+            const list = document.getElementById('courses-list');
+            const newItem = document.createElement('div');
+            newItem.className = 'editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded-md';
+            newItem.innerHTML = `
+                <span contenteditable="true" spellcheck="false">🎓 Nuevo curso</span>
+                <button onclick="deleteItem(this)" class="no-print item-actions text-red-500 hover:text-red-700 text-[0.58rem]"><i class="fa-solid fa-xmark"></i></button>
+            `;
+            list.appendChild(newItem);
+        }
+
+        function addReference() {
+            const container = document.getElementById('references-container');
+            const newItem = document.createElement('div');
+            newItem.className = 'editable-item group relative bg-slate-50 p-1.5 rounded border border-slate-200';
+            newItem.innerHTML = `
+                <h4 contenteditable="true" spellcheck="false" class="font-bold text-slate-900 text-[0.72rem]">Nombre de Referencia</h4>
+                <p contenteditable="true" spellcheck="false" class="text-[0.62rem] text-slate-600">Cargo - Empresa</p>
+                <p contenteditable="true" spellcheck="false" class="text-[0.62rem] font-semibold accent-color">Tel: +57 000 000 0000</p>
+                <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0.5 right-0.5 text-red-500 hover:text-red-700 text-[0.6rem]"><i class="fa-solid fa-trash"></i></button>
+            `;
+            container.appendChild(newItem);
+        }
+    
+        /* FUNCIÓN CLAVE PARA EXPORTAR UN FICHERO HTML COMPLETO Y FUNCIONAL */
+        function exportHTMLFile() {
+            const fullContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const blob = new Blob([fullContent], { type: 'text/html;charset=utf-8' });
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = 'Hoja_de_Vida' + new Date().toLocaleDateString() + '.html';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    </script>
+</body>
+</html>
