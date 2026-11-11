@@ -1,25 +1,27 @@
 # resume-basic-template
 
 📝 Plantilla interactiva para crear tu Hoja de Vida básica y ordenada. El diseño es **fijo**:
-las secciones son las estándar de un CV, la hoja tiene un tamaño único y la letra se ajusta
-sola para que **todo quede en una sola página**. Solo hay dos botones: guardar y imprimir.
+las secciones son las estándar de un CV (todas obligatorias), la hoja es una **Carta** y la
+letra tiene un tamaño fijo que solo se reduce si el contenido no cabe. En la barra hay dos
+botones: guardar e imprimir.
 
 ## Cómo funciona
 
 - **Una sola hoja, siempre.** La letra base es fija (13 px la columna izquierda, 14 px la
-  derecha, 11 px los títulos) y un ajuste automático la escala entre 45 % y 145 % hasta que
-  el contenido cabe en la hoja. Nada se recorta: si aun así no cabe, el indicador de la
-  barra avisa `⚠ No cabe en 1 hoja`.
-- **La hoja no crece.** El alto de la hoja, de la rejilla y de las columnas es fijo; el
-  sobrante se reparte entre las secciones (nunca huecos gigantes).
-- **Secciones fijas, ordenadas por importancia:**
+  derecha, 11 px los títulos) y **nunca crece**: si el contenido no cabe, se reduce (hasta
+  el 45 %) hasta que entra. No hay porcentajes ni amplifyaciones: la letra es la que es.
+- **La hoja no crece.** El alto de la hoja, de la rejilla y de las columnas es fijo, y
+  **cada sección tiene un alto máximo**: si una se pasa de largo, se recorta dentro de ella
+  (sin empujar a las demás) y el indicador de la barra avisa `⚠ Revisa el contenido`.
+- **Secciones fijas, de arriba hacia abajo, ordenadas por importancia:**
   - Izquierda: foto y nombre · Contacto · Perfil profesional · Habilidades · Intereses
   - Derecha: Experiencia profesional · Educación · Cursos y certificaciones · Referencias
+  Todas están siempre: son los datos mínimos de una hoja de vida. Si no se llenan, quedan
+  vacías.
 - **Se pueden añadir elementos dentro de cada sección** (habilidades, intereses,
   experiencias, educaciones, cursos y referencias), pero **no secciones nuevas**.
-- **Hoja fija en Oficio (215,9 × 330,2 mm)**, más alta que A4 para que quepa más contenido
-  sin encoger la letra. Para cambiarla, una línea en `index.html`:
-  `const PAGE_W = '215.9mm'; const PAGE_H = '330.2mm';` (A4: `210mm` × `297mm`).
+- **Hoja fija en Carta (215,9 × 279,4 mm).** Para cambiarla, una línea en `index.html`:
+  `const PAGE_W = '215.9mm'; const PAGE_H = '279.4mm';` (A4: `210mm` × `297mm`).
 
 ## Cómo llenarla
 
@@ -29,7 +31,7 @@ editable en el sitio).
 **Con una IA (o cualquier script):** los datos se pueden pasar en JSON.
 
 - Por URL: `index.html?datos=<JSON>` o `index.html?datos=https://.../mi-cv.json`
-  (la IA puede generar ese archivo y la hoja lo descarga al abrirse).
+  (la IA puede generar ese archivo y la hoja lo carga al abrirse).
 - En la página: `Ctrl` + `Shift` + `D` abre el editor de JSON, con **Copiar JSON**
   (para llevarte los datos actuales) y **Aplicar datos**.
 
@@ -61,7 +63,7 @@ editable en el sitio).
 }
 ```
 
-Todos los campos son opcionales: los que no vengan se dejan como están.
+Todos los campos son opcionales: los que no vengan se quedan vacíos.
 
 ## Guardar e imprimir
 
@@ -76,7 +78,8 @@ Todos los campos son opcionales: los que no vengan se dejan como están.
   cargan por CDN.
 - El tamaño real de la hoja se aplica con `--page-w` / `--page-h` y una regla `@page`
   inyectada por JS (las variables CSS no funcionan dentro de `@page`).
-- La escala del ajuste se aplica con `--fit-scale` sobre el tamaño base fijo de cada columna.
-- Las secciones de una columna nunca se comprimen (`flex-shrink: 0`): si el contenido no
-  cabe, se reduce la letra, no se recorta el texto.
+- La reducción de la letra se aplica con `--fit-scale` sobre el tamaño base fijo de cada
+  columna.
+- Las secciones de una columna nunca se comprimen (`flex-shrink: 0`) y tienen `overflow:
+  hidden`: si el contenido no cabe, se recorta dentro de la sección, no se recorta la hoja.
 - El ajuste se recalcula solo al escribir, añadir o quitar elementos (`MutationObserver`).

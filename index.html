@@ -30,9 +30,9 @@
             --heading-bg: #0284c7;
             --badge-bg: #e0f2fe;
             --badge-text: #0369a1;
-            /* Hoja fija: OFICIO (215,9 x 330,2 mm). Para A4: 210mm x 297mm */
+            /* Hoja fija: CARTA (215,9 x 279,4 mm) */
             --page-w: 215.9mm;
-            --page-h: 330.2mm;
+            --page-h: 279.4mm;
             /* Escala del ajuste automático: la letra base es fija (13/14/11 px) */
             --fit-scale: 1;
             --heading-font-size: 11px;
@@ -42,7 +42,7 @@
 
         /* La regla definitiva se inyecta desde JS según el tamaño de hoja elegido */
         @page {
-            size: 215.9mm 330.2mm;
+            size: 215.9mm 279.4mm;
             margin: 0;
         }
         
@@ -95,6 +95,7 @@
             height: 100% !important;
             justify-content: flex-start !important;
             gap: var(--col-gap, 10px);
+            align-content: flex-start !important;
             transition: background-color 0.2s ease;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -229,61 +230,6 @@
         }
     </style>
 </head>
-    <div id="panel-iconos" class="no-print hidden md:flex flex-wrap gap-[10px] text-[9px] p-5 font-sans bg-[#f8f9fa] border border-[#e9ecef] rounded-[12px] max-w-[58%] select-none justify-self-center my-5 mx-5" 
-     onclick="if(event.target.tagName === 'SPAN') { 
-    navigator.clipboard.writeText(event.target.innerText.trim()); 
-    const el = event.target; 
-    const originalBg = el.style.background; 
-    el.style.background = '#d1e7dd'; 
-    setTimeout(() => el.style.background = originalBg, 300); 
-  }">
-  
-  <div class="text-[#000000] text-[15px] w-100 mb-[5px]">Iconos personalizados para tus textos, click para copiar.</div>
-
-  <!-- Contacto e Información Personal -->
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📞</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📱</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">✉️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📧</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📍</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🌐</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">👤</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🆔</span>
-
-  <!-- Educación, Títulos y Grados -->
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎓</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📜</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📚</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏫</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📖</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏅</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎖️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📝</span>
-
-  <!-- Experiencia Laboral y Organización -->
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">💼</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏢</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📋</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🗓️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">⌛</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎯</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🏆</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🤝</span>
-
-  <!-- Áreas Profesionales y Habilidades -->
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">💻</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🖥️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">⚙️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🛠️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📊</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">📈</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🎨</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🩺</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">⚖️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">✍️</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🔬</span>
-  <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🗣️</span>
-</div>
     <!-- BARRA SUPERIOR: SOLO GUARDAR E IMPRIMIR (todo lo demás es fijo) -->
     <div class="no-print max-w-[210mm] mx-auto mb-4 bg-slate-900 text-white p-3.5 rounded-xl shadow-2xl border border-slate-700 flex flex-wrap justify-between items-center gap-3">
         <div class="flex items-center gap-2.5">
@@ -658,21 +604,15 @@
            Escala la letra para que TODO el contenido quepa en la hoja
            elegida y reparte el espacio sobrante entre las secciones.
            ================================================================ */
-        /* Hoja fija de la plantilla: OFICIO (215,9 x 330,2 mm).
+        /* Hoja fija de la plantilla: CARTA (215,9 x 279,4 mm).
            Para cambiarla basta con estas dos medidas (A4: 210mm x 297mm). */
         const PAGE_W = '215.9mm';
-        const PAGE_H = '330.2mm';
+        const PAGE_H = '279.4mm';
         const FIT_MIN = 0.45;  // hasta dónde se puede reducir la letra
-        const FIT_MAX = 1.45;  // hasta dónde se puede ampliar para llenar la hoja
+        const FIT_MAX = 1;     // la letra base es fija: solo se reduce, nunca crece
         const SETTINGS_KEY = 'resume-basic-template';
 
         let fitTimer = null;
-
-        function toggleIconsPanel() {
-            const panel = document.getElementById('panel-iconos');
-            if (!panel) return;
-            panel.classList.toggle('hidden');
-        }
 
         /* Alto REAL del contenido de una columna: incluye márgenes y separaciones.
            Se mide con el borde inferior del último hijo, que es lo que de verdad ocupa. */
@@ -722,22 +662,13 @@
             if (left.clientHeight < 50 || right.clientHeight < 50) return;
 
             const setScale = value => root.style.setProperty('--fit-scale', value);
-            const gapOf = col => parseFloat(getComputedStyle(col).rowGap) || 0;
             const contentOf = col => measureContent(col);
-            const sumOf = col => {
-                const kids = [...col.children];
-                return measureContent(col) - gapOf(col) * Math.max(kids.length - 1, 0);
-            };
             // ¿cabe el contenido de las dos columnas en la altura disponible?
             const fits = () => contentOf(left) <= left.clientHeight + 0.5
                 && contentOf(right) <= right.clientHeight + 0.5;
 
             let scale = 1;
             {
-                // medición estable: hueco mínimo mientras se busca la escala
-                left.style.gap = '8px';
-                right.style.gap = '8px';
-
                 let lo = FIT_MIN;
                 let hi = FIT_MAX;
                 let best = FIT_MIN;
@@ -750,20 +681,33 @@
                 setScale(scale);
             }
 
-            // reparto del sobrante entre secciones: sin huecos gigantes ni cortes
-            [left, right].forEach(col => {
-                const children = [...col.children];
-                if (children.length < 2) { col.style.gap = '0px'; return; }
-                const free = col.clientHeight - sumOf(col);
-                const maxGap = free / (children.length - 1);
-                const gap = Math.min(Math.max(maxGap, 8), 26);
-                col.style.gap = gap + 'px';
-            });
+            // alto maximo de cada seccion: la hoja no crece aunque haya exceso
+            const clipped = capSections(left) || capSections(right);
 
-            updateFitStatus(scale);
+            updateFitStatus(scale, clipped);
         }
 
-        function updateFitStatus(scale) {
+        /* Fija el alto maximo de cada seccion para que la hoja nunca crezca.
+           Devuelve true si alguna seccion quedo recortada. */
+        function capSections(col) {
+            const kids = [...col.children];
+            if (!kids.length) return false;
+            const gap = parseFloat(getComputedStyle(col).rowGap) || 0;
+            const avail = col.clientHeight - gap * Math.max(kids.length - 1, 0);
+            kids.forEach(kid => { kid.style.maxHeight = 'none'; });
+            const natural = kids.map(kid => kid.getBoundingClientRect().height);
+            const total = natural.reduce((acc, value) => acc + value, 0);
+            if (total <= avail || total <= 0) {
+                kids.forEach(kid => { kid.style.maxHeight = 'none'; });
+                return false;
+            }
+            kids.forEach((kid, i) => {
+                kid.style.maxHeight = Math.max(Math.floor(avail * natural[i] / total), 40) + 'px';
+            });
+            return true;
+        }
+
+        function updateFitStatus(scale, clipped) {
             const badge = document.getElementById('fit-status');
             if (!badge) return;
             const left = document.getElementById('col-left');
@@ -774,12 +718,12 @@
                 || rightUsed > right.clientHeight + 0.5;
             badge.title = 'Izq: ' + Math.round(leftUsed) + ' de ' + left.clientHeight + ' px · '
                 + 'Der: ' + Math.round(rightUsed) + ' de ' + right.clientHeight + ' px · '
-                + 'Escala: ' + Math.round(scale * 100) + '%';
-            if (overflows) {
-                badge.textContent = '⚠ No cabe en 1 hoja';
+                + 'Letra: ' + Math.round(scale * 100) + '% de la base';
+            if (overflows || clipped) {
+                badge.textContent = '⚠ Revisa el contenido';
                 badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30';
             } else {
-                badge.textContent = '1 hoja · ' + Math.round(scale * 100) + '%';
+                badge.textContent = '1 hoja';
                 badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
             }
         }
@@ -901,7 +845,7 @@
             if (img && data.foto) img.src = data.foto;
 
             const contactList = document.querySelector('#col-left ul');
-            if (contactList && Array.isArray(data.contacto) && data.contacto.length) {
+            if (contactList && Array.isArray(data.contacto)) {
                 const template = contactList.querySelector('li');
                 contactList.innerHTML = '';
                 data.contacto.forEach(c => {
@@ -944,7 +888,7 @@
             }
 
             const exp = document.getElementById('experience-container');
-            if (exp && Array.isArray(data.experiencia) && data.experiencia.length) {
+            if (exp && Array.isArray(data.experiencia)) {
                 const template = exp.querySelector('.editable-item');
                 exp.innerHTML = '';
                 data.experiencia.forEach(item => {
@@ -964,7 +908,7 @@
             }
 
             const edu = document.getElementById('education-container');
-            if (edu && Array.isArray(data.educacion) && data.educacion.length) {
+            if (edu && Array.isArray(data.educacion)) {
                 const template = edu.querySelector('.editable-item');
                 edu.innerHTML = '';
                 data.educacion.forEach(item => {
@@ -995,7 +939,7 @@
             }
 
             const refs = document.getElementById('references-container');
-            if (refs && Array.isArray(data.referencias) && data.referencias.length) {
+            if (refs && Array.isArray(data.referencias)) {
                 const template = refs.querySelector('.editable-item');
                 refs.innerHTML = '';
                 data.referencias.forEach(item => {
