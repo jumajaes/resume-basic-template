@@ -347,7 +347,7 @@
                 <div>
                     <div class="section-header">
                         <span contenteditable="true" spellcheck="false">⚡ HABILIDADES</span>
-                        <button onclick="addSkill()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                        <button onclick="addSkill()" class="js-add-item no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
                     </div>
                     <ul id="skills-list" class="space-y-0.5 text-xs text-slate-800 font-medium">
                         <li class="editable-item flex items-center justify-between group">
@@ -373,7 +373,7 @@
                 <div>
                     <div class="section-header">
                         <span contenteditable="true" spellcheck="false">🌱 INTERESES</span>
-                        <button onclick="addInterest()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                        <button onclick="addInterest()" class="js-add-item no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
                     </div>
                     <div id="interests-list" class="flex flex-wrap gap-1 text-xs font-medium">
                         <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 text-slate-800 px-2 py-0.5 rounded-full">
@@ -400,7 +400,7 @@
                 <div>
                     <div class="section-header">
                         <span contenteditable="true" spellcheck="false">💼 EXPERIENCIA PROFESIONAL</span>
-                        <button onclick="addExperience()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                        <button onclick="addExperience()" class="js-add-item no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
                     </div>
 
                     <div id="experience-container" class="space-y-1">
@@ -446,7 +446,7 @@
                 <div>
                     <div class="section-header">
                         <span contenteditable="true" spellcheck="false">🎓 EDUCACIÓN FORMATIVA</span>
-                        <button onclick="addEducation()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                        <button onclick="addEducation()" class="js-add-item no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
                     </div>
 
                     <div id="education-container" class="space-y-1">
@@ -465,7 +465,7 @@
                 <div>
                     <div class="section-header">
                         <span contenteditable="true" spellcheck="false">📜 CURSOS Y CERTIFICACIONES</span>
-                        <button onclick="addCourse()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                        <button onclick="addCourse()" class="js-add-item no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
                     </div>
                     <div id="courses-list" class="flex flex-wrap gap-1 text-xs font-medium text-slate-800">
                         <div class="editable-item group inline-flex items-center gap-1 bg-slate-100 border border-slate-200 px-1.5 py-0.2 rounded-md">
@@ -487,7 +487,7 @@
                 <div>
                     <div class="section-header">
                         <span contenteditable="true" spellcheck="false">👥 REFERENCIAS LABORALES Y PERSONALES</span>
-                        <button onclick="addReference()" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
+                        <button onclick="addReference()" class="js-add-item no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
                     </div>
                     <div id="references-container" class="grid grid-cols-2 gap-2">
                         <div class="editable-item group relative bg-slate-50 p-1.5 rounded border border-slate-200">
@@ -609,7 +609,7 @@
         const PAGE_W = '215.9mm';
         const PAGE_H = '279.4mm';
         const FIT_MIN = 0.45;  // hasta dónde se puede reducir la letra
-        const FIT_MAX = 1;     // la letra base es fija: solo se reduce, nunca crece
+        const FIT_MAX = 1.25;  // la letra crece hasta este tope para llenar la hoja
         const SETTINGS_KEY = 'resume-basic-template';
 
         let fitTimer = null;
@@ -743,6 +743,16 @@
             kids.forEach((kid, i) => { kid.style.flexGrow = String(Math.max(natural[i], 1)); });
         }
 
+        /* Si el contenido ya no cabe, no se deja anadir mas */
+        function toggleAddButtons(enabled) {
+            document.querySelectorAll('.js-add-item').forEach(button => {
+                button.disabled = !enabled;
+                button.style.opacity = enabled ? '' : '0.35';
+                button.style.cursor = enabled ? '' : 'not-allowed';
+                button.title = enabled ? '' : 'No cabe mas contenido en la hoja: acorta o elimina algo';
+            });
+        }
+
         /* Aviso solo cuando algo se recorta: si todo cabe, la barra queda limpia */
         function updateFitStatus(scale, clipped) {
             const badge = document.getElementById('fit-status');
@@ -751,6 +761,7 @@
             const right = document.getElementById('col-right');
             const overflows = measureContent(left) > left.clientHeight + 0.5
                 || measureContent(right) > right.clientHeight + 0.5;
+            toggleAddButtons(!(overflows || clipped));
             if (overflows || clipped) {
                 badge.textContent = '⚠ Revisa el contenido';
                 badge.title = 'Alguna sección quedó recortada: acorta ese texto para que quepa.';
