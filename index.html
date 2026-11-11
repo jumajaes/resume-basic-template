@@ -105,7 +105,7 @@
         }
 
         /* Las secciones nunca se comprimen: si no caben, el ajuste reduce la letra */
-        .column-box > * { flex-shrink: 0; }
+        .column-box > * { flex-shrink: 0; overflow: hidden; }
 
         #col-left { font-size: calc(13px * var(--fit-scale, 1)); background-color: #ffffff; }
         #col-right { font-size: calc(14px * var(--fit-scale, 1)); background-color: #ffffff; }
@@ -243,7 +243,7 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
-            <span id="fit-status" class="text-[11px] font-semibold px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Estado del ajuste a una sola hoja">1 hoja</span>
+            <span id="fit-status" class="hidden text-[11px] font-semibold px-2 py-1 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30" title="Alguna sección quedó recortada: acorta ese texto para que quepa."></span>
             <button onclick="exportHTMLFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-md flex items-center gap-1.5" title="Guardar una copia de este archivo editable para llevar a otra PC">
                 <i class="fa-solid fa-download"></i> Guardar cambios (.html)
             </button>
@@ -682,7 +682,9 @@
             }
 
             // alto maximo de cada seccion: la hoja no crece aunque haya exceso
-            const clipped = capSections(left) || capSections(right);
+            const clippedLeft = capSections(left);
+            const clippedRight = capSections(right);
+            const clipped = clippedLeft || clippedRight;
 
             updateFitStatus(scale, clipped);
         }
@@ -692,8 +694,10 @@
         function capSections(col) {
             const kids = [...col.children];
             if (!kids.length) return false;
-            const gap = parseFloat(getComputedStyle(col).rowGap) || 0;
-            const avail = col.clientHeight - gap * Math.max(kids.length - 1, 0);
+            const styles = getComputedStyle(col);
+            const gap = parseFloat(styles.rowGap) || 0;
+            const padding = (parseFloat(styles.paddingTop) || 0) + (parseFloat(styles.paddingBottom) || 0);
+            const avail = Math.max(col.clientHeight - padding - gap * Math.max(kids.length - 1, 0), 0);
             kids.forEach(kid => { kid.style.maxHeight = 'none'; });
             const natural = kids.map(kid => kid.getBoundingClientRect().height);
             const total = natural.reduce((acc, value) => acc + value, 0);
@@ -701,30 +705,36 @@
                 kids.forEach(kid => { kid.style.maxHeight = 'none'; });
                 return false;
             }
-            kids.forEach((kid, i) => {
-                kid.style.maxHeight = Math.max(Math.floor(avail * natural[i] / total), 40) + 'px';
-            });
+            // reparto proporcional del presupuesto, con un minimo por seccion
+            const MIN = 32;
+            let alloc = natural.map(value => Math.max(Math.floor(avail * value / total), MIN));
+            let sum = alloc.reduce((acc, value) => acc + value, 0);
+            while (sum > avail) {
+                const biggest = alloc.indexOf(Math.max(...alloc));
+                const cut = Math.min(sum - avail, Math.max(alloc[biggest] - MIN, 0));
+                if (cut <= 0) break;
+                alloc[biggest] -= cut;
+                sum -= cut;
+            }
+            kids.forEach((kid, i) => { kid.style.maxHeight = alloc[i] + 'px'; });
             return true;
         }
 
+        /* Aviso solo cuando algo se recorta: si todo cabe, la barra queda limpia */
         function updateFitStatus(scale, clipped) {
             const badge = document.getElementById('fit-status');
             if (!badge) return;
             const left = document.getElementById('col-left');
             const right = document.getElementById('col-right');
-            const leftUsed = measureContent(left);
-            const rightUsed = measureContent(right);
-            const overflows = leftUsed > left.clientHeight + 0.5
-                || rightUsed > right.clientHeight + 0.5;
-            badge.title = 'Izq: ' + Math.round(leftUsed) + ' de ' + left.clientHeight + ' px · '
-                + 'Der: ' + Math.round(rightUsed) + ' de ' + right.clientHeight + ' px · '
-                + 'Letra: ' + Math.round(scale * 100) + '% de la base';
+            const overflows = measureContent(left) > left.clientHeight + 0.5
+                || measureContent(right) > right.clientHeight + 0.5;
             if (overflows || clipped) {
                 badge.textContent = '⚠ Revisa el contenido';
-                badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30';
+                badge.title = 'Alguna sección quedó recortada: acorta ese texto para que quepa.';
+                badge.className = 'text-[11px] font-semibold px-2 py-1 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30';
+                badge.style.display = '';
             } else {
-                badge.textContent = '1 hoja';
-                badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+                badge.style.display = 'none';
             }
         }
 
