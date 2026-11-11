@@ -30,13 +30,10 @@
             --heading-bg: #0284c7;
             --badge-bg: #e0f2fe;
             --badge-text: #0369a1;
-            /* Tamaño de hoja: lo cambia la barra de herramientas (A4, Oficio o Carta) */
-            --page-w: 210mm;
-            --page-h: 297mm;
-            /* Tamaños base del CV; el ajuste automático los escala para que todo quepa en 1 hoja */
-            --base-left-size: 13px;
-            --base-right-size: 14px;
-            --base-heading-size: 11px;
+            /* Hoja fija: OFICIO (215,9 x 330,2 mm). Para A4: 210mm x 297mm */
+            --page-w: 215.9mm;
+            --page-h: 330.2mm;
+            /* Escala del ajuste automático: la letra base es fija (13/14/11 px) */
             --fit-scale: 1;
             --heading-font-size: 11px;
             /* Separación vertical entre secciones de una columna */
@@ -45,7 +42,7 @@
 
         /* La regla definitiva se inyecta desde JS según el tamaño de hoja elegido */
         @page {
-            size: 210mm 297mm;
+            size: 215.9mm 330.2mm;
             margin: 0;
         }
         
@@ -83,6 +80,7 @@
         .cv-grid {
             display: grid !important;
             grid-template-columns: 36% 61% !important;
+            grid-template-rows: minmax(0, 1fr) !important;
             column-gap: 3% !important;
             flex: 1;
             height: 100%;
@@ -108,8 +106,8 @@
         /* Las secciones nunca se comprimen: si no caben, el ajuste reduce la letra */
         .column-box > * { flex-shrink: 0; }
 
-        #col-left { font-size: calc(var(--base-left-size, 13px) * var(--fit-scale, 1)); background-color: #ffffff; }
-        #col-right { font-size: calc(var(--base-right-size, 14px) * var(--fit-scale, 1)); background-color: #ffffff; }
+        #col-left { font-size: calc(13px * var(--fit-scale, 1)); background-color: #ffffff; }
+        #col-right { font-size: calc(14px * var(--fit-scale, 1)); background-color: #ffffff; }
 
         /* Adaptación de clases tipográficas */
         .cv-paper .text-xl { font-size: 1.3em !important; }
@@ -152,7 +150,7 @@
             color: #ffffff;
             padding: 3px 6px;
             border-radius: 4px;
-            font-size: calc(var(--base-heading-size, 11px) * var(--fit-scale, 1)) !important;
+            font-size: calc(11px * var(--fit-scale, 1)) !important;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -224,7 +222,7 @@
             .section-header {
                 background-color: var(--heading-bg) !important;
                 color: #ffffff !important;
-                font-size: calc(var(--base-heading-size, 11px) * var(--fit-scale, 1)) !important;
+                font-size: calc(11px * var(--fit-scale, 1)) !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -286,151 +284,50 @@
   <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🔬</span>
   <span title="Haz clic para copiar" style="cursor: pointer; padding: 6px 10px; background: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; transition: background 0.2s;">🗣️</span>
 </div>
-    <!-- BARRA SUPERIOR DE HERRAMIENTAS Y CONTROLES -->
+    <!-- BARRA SUPERIOR: SOLO GUARDAR E IMPRIMIR (todo lo demás es fijo) -->
     <div class="no-print max-w-[210mm] mx-auto mb-4 bg-slate-900 text-white p-3.5 rounded-xl shadow-2xl border border-slate-700 flex flex-wrap justify-between items-center gap-3">
         <div class="flex items-center gap-2.5">
             <div class="bg-sky-600 text-white p-2 rounded-lg text-xs font-bold shadow-sm">
-                <i class="fa-solid fa-sliders"></i>
+                <i class="fa-solid fa-file-lines"></i>
             </div>
             <div>
-                <h1 class="font-bold text-xs leading-tight text-slate-100">Panel de Control CV</h1>
-                <p class="text-[11px] text-slate-400">Edición</p>
+                <h1 class="font-bold text-xs leading-tight text-slate-100">Hoja de vida</h1>
+                <p class="text-[11px] text-slate-400">Ctrl+Shift+D abre los datos en JSON (una IA puede llenarlos)</p>
             </div>
         </div>
 
-        <!-- BOTÓN: EXPORTAR ARCHIVO HTML -->
-        <button onclick="exportHTMLFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-md flex items-center gap-1.5" title="Guardar una copia de este archivo editable para llevar a otra PC">
-            <i class="fa-solid fa-download"></i> Guardar cambios (.html)
-        </button>
-
         <div class="flex flex-wrap items-center gap-2">
-            <!-- TAMAÑO DE HOJA, AJUSTE AUTOMÁTICO Y ESTADO -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
-                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-file-lines text-sky-400 mr-1"></i>Hoja:</span>
-                <select id="page-size-select" onchange="setPageSize(this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
-                    <option value="a4" selected>A4 (210 × 297 mm)</option>
-                    <option value="oficio">Oficio (216 × 356 mm)</option>
-                    <option value="carta">Carta (216 × 279 mm)</option>
-                </select>
-                <label class="flex items-center gap-1 text-[11px] text-slate-400 px-1 font-medium cursor-pointer" title="Ajusta la letra automáticamente para que todo el contenido quepa en una sola hoja">
-                    <input type="checkbox" id="auto-fit-toggle" onchange="setAutoFit(this.checked)" checked class="accent-sky-500 cursor-pointer">
-                    Auto
-                </label>
-                <span id="fit-status" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Estado del ajuste a una sola página">1 página</span>
-                <button onclick="resetSettings()" class="bg-slate-900 hover:bg-slate-700 text-slate-400 text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Volver a los valores por defecto">Restablecer</button>
-                <button onclick="toggleIconsPanel()" class="bg-slate-900 hover:bg-slate-700 text-slate-400 text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Mostrar u ocultar el catálogo de iconos">Iconos</button>
-            </div>
-
-            <!-- Tamaños de Letra Texto -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1">
-                <span class="text-[11px] text-slate-400 px-1 font-medium" title="Tamaño base de la letra; el ajuste automático lo escala"><i class="fa-solid fa-font text-sky-400 mr-1"></i>Izq:</span>
-                <select onchange="setColumnFontSize('col-left', this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
-                    <option value="11">11px</option>
-                    <option value="12">12px</option>
-                    <option value="13" selected>13px</option>
-                    <option value="14">14px</option>
-                    <option value="16">16px</option>
-                    <option value="18">18px</option>
-                    <option value="20">20px</option>
-                    <option value="22">22px</option>
-                    <option value="24">24px</option>
-                    <option value="26">26px</option>
-                </select>
-                <span class="text-[11px] text-slate-400 px-1 font-medium">Der:</span>
-                <select onchange="setColumnFontSize('col-right', this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
-                    <option value="11">11px</option>
-                    <option value="12">12px</option>
-                    <option value="13">13px</option>
-                    <option value="14" selected>14px</option>
-                    <option value="15">15px</option>
-                    <option value="16">16px</option>
-                    <option value="18">18px</option>
-                    <option value="20">20px</option>
-                    <option value="22">22px</option>
-                    <option value="24">24px</option>
-                    <option value="26">26px</option>
-                </select>
-            </div>
-
-            <!-- CONTROL PARA TAMAÑO DE TÍTULOS -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
-                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-heading text-sky-400 mr-1"></i>Títulos:</span>
-                <select onchange="setHeadingFontSize(this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-2 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
-                    <option value="9">9 px</option>
-                    <option value="10">10 px</option>
-                    <option value="11">11 px</option>
-                    <option value="12">12 px</option>
-                    <option value="13">13 px</option>
-                    <option value="14">14 px</option>
-                    <option value="15">15 px</option>
-                    <option value="16">16px</option>
-                    <option value="18">18px</option>
-                    <option value="11" selected>11px</option>
-                    <option value="22">22px</option>
-                    <option value="24">24px</option>
-                    <option value="26">26px</option>
-                </select>
-            </div>
-
-            <!-- BOTONES PARA AGREGAR NUEVA SECCIÓN PERSONALIZADA -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1">
-                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-plus-circle text-sky-400 mr-1"></i>Sección:</span>
-                <button onclick="addCustomSection('col-left')" class="bg-slate-900 hover:bg-slate-700 text-sky-400 text-xs font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Agregar sección en la izquierda">
-                    + Izq
-                </button>
-                <button onclick="addCustomSection('col-right')" class="bg-slate-900 hover:bg-slate-700 text-sky-400 text-xs font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Agregar sección en la derecha">
-                    + Der
-                </button>
-            </div>
-
-            <!-- CONTROLES DE COLOR DE FONDO DE COLUMNAS -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
-                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-fill-drip text-sky-400 mr-1"></i>Fondo:</span>
-                <div class="flex items-center gap-1" title="Color fondo columna izquierda">
-                    <span class="text-[10px] text-slate-400">Izq</span>
-                    <input type="color" value="#ffffff" onchange="setColumnBgColor('col-left', this.value)" class="w-5 h-5 rounded cursor-pointer border-0 bg-transparent">
-                </div>
-                <div class="flex items-center gap-1" title="Color fondo columna derecha">
-                    <span class="text-[10px] text-slate-400">Der</span>
-                    <input type="color" value="#ffffff" onchange="setColumnBgColor('col-right', this.value)" class="w-5 h-5 rounded cursor-pointer border-0 bg-transparent">
-                </div>
-            </div>
-
-            <!-- CONTROLES DE FOTO (MARCO, RADIO, ZOOM Y EJE Y) -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-2">
-                <div class="flex items-center gap-1" title="Tamaño del marco">
-                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-circle-dot text-sky-400 mr-1"></i>Marco:</span>
-                    <input type="range" min="60" max="250" value="85" oninput="setPhotoSize(this.value)" class="w-12 accent-sky-500 cursor-pointer">
-                </div>
-                <div class="flex items-center gap-1" title="Redondeo / Radio de la foto">
-                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-icons text-sky-400 mr-1"></i>Radio:</span>
-                    <input type="range" min="0" max="50" value="50" oninput="setPhotoRadius(this.value)" class="w-12 accent-sky-500 cursor-pointer">
-                </div>
-                <div class="flex items-center gap-1" title="Zoom dentro del marco">
-                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-magnifying-glass-plus text-sky-400 mr-1"></i>Zoom:</span>
-                    <input type="range" min="1" max="5.0" step="0.05" value="1" oninput="setPhotoZoom(this.value)" class="w-12 accent-sky-500 cursor-pointer">
-                </div>
-                <div class="flex items-center gap-1" title="Mover foto arriba/abajo">
-                    <span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-arrows-up-down text-sky-400 mr-1"></i>Eje Y:</span>
-                    <input type="range" min="0" max="100" value="50" oninput="setPhotoPosY(this.value)" class="w-12 accent-sky-500 cursor-pointer">
-                </div>
-            </div>
-
-            <!-- COLOR DE ACENTO -->
-            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
-                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-palette text-sky-400 mr-1"></i>Acento:</span>
-                <input type="color" id="accent-color" value="#0284c7" onchange="setCustomAccentColor(this.value)" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent">
-            </div>
-
-            <!-- ACCIONES -->
-            <button onclick="triggerPhotoUpload()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs px-2.5 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1">
-                <i class="fa-solid fa-camera text-sky-400"></i> Cambiar
+            <span id="fit-status" class="text-[11px] font-semibold px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Estado del ajuste a una sola hoja">1 hoja</span>
+            <button onclick="exportHTMLFile()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-md flex items-center gap-1.5" title="Guardar una copia de este archivo editable para llevar a otra PC">
+                <i class="fa-solid fa-download"></i> Guardar cambios (.html)
             </button>
-            <input type="file" id="photo-file-input" class="hidden" accept="image/*" onchange="loadPhotoFromFile(event)">
-
             <button onclick="window.print()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-3 py-1.5 rounded-lg transition shadow-md flex items-center gap-1.5">
                 <i class="fa-solid fa-file-pdf"></i> Imprimir / PDF
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE DATOS JSON -->
+    <div id="modal-datos" class="no-print fixed inset-0 z-50 hidden items-center justify-center p-4" style="background: rgba(15,23,42,.78); backdrop-filter: blur(2px);">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-3xl p-4 shadow-2xl">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="text-white font-bold text-sm">Datos de la hoja de vida (JSON)</h2>
+                <button onclick="toggleModalDatos(false)" class="text-slate-300 hover:text-white text-xs font-bold px-2 py-1 rounded border border-slate-600">Cerrar</button>
+            </div>
+            <p class="text-slate-400 text-[11px] mb-2 leading-snug">
+                Esta hoja se llena con un JSON: pégalo y pulsa <b>Aplicar datos</b>.
+                También se abre con <code>?datos=&lt;JSON&gt;</code> o <code>?datos=https://.../mi-cv.json</code>,
+                así una IA puede generar ese archivo. Con <b>Copiar JSON</b> te llevas los datos actuales.
+            </p>
+            <textarea id="datos-json" spellcheck="false" class="w-full h-64 bg-slate-900 text-slate-200 text-xs font-mono p-3 rounded border border-slate-600 focus:outline-none"></textarea>
+            <div id="datos-error" class="hidden mt-2 text-[11px] text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded px-2 py-1"></div>
+            <div class="flex items-center justify-between mt-3">
+                <button onclick="copiarDatos()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold px-3 py-1.5 rounded border border-slate-600">Copiar JSON</button>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleModalDatos(false)" class="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold px-3 py-1.5 rounded border border-slate-600">Cancelar</button>
+                    <button onclick="aplicarDatos()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded">Aplicar datos</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -450,9 +347,6 @@
                                  src="https://images.unsplash.com/photo-1594824813566-7885a39644d6?w=400&auto=format&fit=crop&q=80" 
                                  alt="Foto de Perfil">
                         </div>
-                        <button onclick="triggerPhotoUpload()" class="no-print absolute bottom-0 right-0 bg-slate-900 text-white p-1 rounded-full shadow-lg hover:bg-sky-600 transition text-[10px]" title="Cambiar foto">
-                            <i class="fa-solid fa-camera"></i>
-                        </button>
                     </div>
                     
                     <h1 contenteditable="true" spellcheck="false" class="font-display font-extrabold text-xl tracking-tight text-slate-900 uppercase leading-tight">
@@ -675,120 +569,9 @@
         let currentPhotoScale = 1;
         let currentPhotoPosY = 50;
 
-        function updatePhotoTransform() {
-            const img = document.getElementById('profile-img');
-            if (img) {
-                img.style.transform = `scale(${currentPhotoScale})`;
-                img.style.objectPosition = `50% ${currentPhotoPosY}%`;
-            }
-        }
-
-        function setPhotoSize(sizePx) {
-            const wrapper = document.getElementById('photo-wrapper');
-            if (wrapper) {
-                wrapper.style.width = sizePx + 'px';
-                wrapper.style.height = sizePx + 'px';
-            }
-        }
-
-        function setPhotoRadius(val) {
-            const wrapper = document.getElementById('photo-wrapper');
-            if (wrapper) {
-                wrapper.style.borderRadius = val + '%';
-            }
-        }
-
-        function setPhotoZoom(val) {
-            currentPhotoScale = val;
-            updatePhotoTransform();
-        }
-
-        function setPhotoPosY(val) {
-            currentPhotoPosY = val;
-            updatePhotoTransform();
-        }
-
-        function setColumnFontSize(colId, sizePx) {
-            const varName = colId === 'col-left' ? '--base-left-size' : '--base-right-size';
-            document.documentElement.style.setProperty(varName, sizePx + 'px');
-            saveSettings();
-            applyFit();
-        }
-
-        function setHeadingFontSize(sizePx) {
-            document.documentElement.style.setProperty('--base-heading-size', sizePx + 'px');
-            saveSettings();
-            applyFit();
-        }
-
-        function setColumnBgColor(colId, color) {
-            document.getElementById(colId).style.backgroundColor = color;
-            saveSettings();
-        }
-
-        function setCustomAccentColor(color) {
-            document.documentElement.style.setProperty('--primary-accent', color);
-            document.documentElement.style.setProperty('--heading-bg', color);
-            const picker = document.getElementById('accent-color');
-            if (picker) picker.value = color;
-            saveSettings();
-        }
-
-        function triggerPhotoUpload() {
-            document.getElementById('photo-file-input').click();
-        }
-
-        function loadPhotoFromFile(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('profile-img').src = e.target.result;
-                }
-                reader.readAsDataURL(file);
-            }
-        }
-
         function deleteItem(btn) {
             const item = btn.closest('.editable-item');
             if (item) item.remove();
-        }
-
-        function addCustomSection(columnId) {
-            const column = document.getElementById(columnId);
-            const newSection = document.createElement('div');
-            newSection.className = 'editable-item group relative';
-            newSection.innerHTML = `
-                <div class="section-header">
-                    <span contenteditable="true" spellcheck="false">⭐ NUEVA SECCIÓN</span>
-                    <div class="flex items-center gap-1">
-                        <button onclick="addCustomSubItem(this)" class="no-print text-[0.58rem] bg-white/20 hover:bg-white/30 text-white font-bold px-1 py-0.2 rounded transition">+ Añadir</button>
-                        <button onclick="deleteItem(this)" class="no-print item-actions text-red-200 hover:text-white text-[0.58rem] px-1" title="Eliminar sección completa"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-                <div class="custom-content space-y-1">
-                    <div class="editable-item group relative">
-                        <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-700 leading-snug">
-                            Escribe aquí el contenido de tu nueva sección personalizada. Puedes hacer clic en el título para cambiarle el nombre.
-                        </p>
-                        <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>
-            `;
-            column.appendChild(newSection);
-        }
-
-        function addCustomSubItem(btn) {
-            const container = btn.closest('.editable-item').querySelector('.custom-content');
-            const newItem = document.createElement('div');
-            newItem.className = 'editable-item group relative';
-            newItem.innerHTML = `
-                <p contenteditable="true" spellcheck="false" class="text-[0.68rem] text-slate-700 leading-snug">
-                    Nuevo elemento editable...
-                </p>
-                <button onclick="deleteItem(this)" class="no-print item-actions absolute top-0 right-0 text-red-500 hover:text-red-700 text-xs"><i class="fa-solid fa-trash"></i></button>
-            `;
-            container.appendChild(newItem);
         }
 
         function addSkill() {
@@ -875,77 +658,15 @@
            Escala la letra para que TODO el contenido quepa en la hoja
            elegida y reparte el espacio sobrante entre las secciones.
            ================================================================ */
-        const PAGE_SIZES = {
-            a4:     { w: '210mm',   h: '297mm' },
-            oficio: { w: '215.9mm', h: '355.6mm' },
-            carta:  { w: '215.9mm', h: '279.4mm' }
-        };
-        const FIT_MIN = 0.55;  // hasta dónde se puede reducir la letra
+        /* Hoja fija de la plantilla: OFICIO (215,9 x 330,2 mm).
+           Para cambiarla basta con estas dos medidas (A4: 210mm x 297mm). */
+        const PAGE_W = '215.9mm';
+        const PAGE_H = '330.2mm';
+        const FIT_MIN = 0.45;  // hasta dónde se puede reducir la letra
         const FIT_MAX = 1.45;  // hasta dónde se puede ampliar para llenar la hoja
         const SETTINGS_KEY = 'resume-basic-template';
 
-        let autoFit = true;
         let fitTimer = null;
-
-        function getSettings() {
-            try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; }
-            catch (e) { return {}; }
-        }
-
-        function getBaseSize(varName, fallback) {
-            const value = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(varName));
-            return isNaN(value) ? fallback : value;
-        }
-
-        function saveSettings() {
-            try {
-                localStorage.setItem(SETTINGS_KEY, JSON.stringify({
-                    pageSize: currentPageSize(),
-                    baseLeft: getBaseSize('--base-left-size', 13),
-                    baseRight: getBaseSize('--base-right-size', 14),
-                    baseHeading: getBaseSize('--base-heading-size', 11),
-                    accent: getComputedStyle(document.documentElement).getPropertyValue('--primary-accent').trim(),
-                    bgLeft: document.getElementById('col-left').style.backgroundColor,
-                    bgRight: document.getElementById('col-right').style.backgroundColor,
-                    autoFit: autoFit
-                }));
-            } catch (e) { /* modo privado: se guarda solo en memoria */ }
-        }
-
-        function currentPageSize() {
-            const select = document.getElementById('page-size-select');
-            return select && PAGE_SIZES[select.value] ? select.value : 'a4';
-        }
-
-        function setPageSize(key) {
-            const size = PAGE_SIZES[key] || PAGE_SIZES.a4;
-            const root = document.documentElement;
-            const select = document.getElementById('page-size-select');
-            if (select && select.value !== key) select.value = key;
-            root.style.setProperty('--page-w', size.w);
-            root.style.setProperty('--page-h', size.h);
-            // @page no admite variables CSS: se inyecta la regla definitiva
-            let rule = document.getElementById('page-rule');
-            if (!rule) {
-                rule = document.createElement('style');
-                rule.id = 'page-rule';
-                document.head.appendChild(rule);
-            }
-            rule.textContent = '@page { size: ' + size.w + ' ' + size.h + '; margin: 0; }';
-            saveSettings();
-            applyFit();
-        }
-
-        function setAutoFit(enabled) {
-            autoFit = enabled;
-            saveSettings();
-            applyFit();
-        }
-
-        function resetSettings() {
-            try { localStorage.removeItem(SETTINGS_KEY); } catch (e) { /* sin almacenamiento */ }
-            location.reload();
-        }
 
         function toggleIconsPanel() {
             const panel = document.getElementById('panel-iconos');
@@ -953,16 +674,19 @@
             panel.classList.toggle('hidden');
         }
 
-        /* Alto real del contenido de una columna.
-           Los hijos se miden sin compresión: si el ajuste falla, el aviso sale de aquí. */
+        /* Alto REAL del contenido de una columna: incluye márgenes y separaciones.
+           Se mide con el borde inferior del último hijo, que es lo que de verdad ocupa. */
         function measureContent(col) {
             const kids = [...col.children];
-            const previous = kids.map(kid => kid.style.flexShrink);
-            kids.forEach(kid => { kid.style.flexShrink = '0'; });
-            const gap = parseFloat(getComputedStyle(col).rowGap) || 0;
-            const sum = kids.reduce((acc, kid) => acc + kid.offsetHeight, 0);
-            kids.forEach((kid, i) => { kid.style.flexShrink = previous[i]; });
-            return sum + gap * Math.max(kids.length - 1, 0);
+            if (!kids.length) return 0;
+            const box = col.getBoundingClientRect();
+            let bottom = 0;
+            for (const kid of kids) {
+                const rect = kid.getBoundingClientRect();
+                if (rect.height || rect.width) bottom = Math.max(bottom, rect.bottom - box.top);
+            }
+            const padding = parseFloat(getComputedStyle(col).paddingBottom) || 0;
+            return bottom + padding;
         }
 
         /* Alto que ocupan las secciones de una columna */
@@ -972,6 +696,20 @@
 
         function fitScaleFor(col) {
             return col.clientHeight / Math.max(measureContent(col), 1);
+        }
+
+        /* Aplica el tamaño fijo de hoja (variables CSS + regla @page) */
+        function applyPageSize() {
+            const root = document.documentElement;
+            root.style.setProperty('--page-w', PAGE_W);
+            root.style.setProperty('--page-h', PAGE_H);
+            let rule = document.getElementById('page-rule');
+            if (!rule) {
+                rule = document.createElement('style');
+                rule.id = 'page-rule';
+                document.head.appendChild(rule);
+            }
+            rule.textContent = '@page { size: ' + PAGE_W + ' ' + PAGE_H + '; margin: 0; }';
         }
 
         /* Escala la letra y reparte el espacio sobrante: nada se sale de la hoja */
@@ -995,7 +733,7 @@
                 && contentOf(right) <= right.clientHeight + 0.5;
 
             let scale = 1;
-            if (autoFit) {
+            {
                 // medición estable: hueco mínimo mientras se busca la escala
                 left.style.gap = '8px';
                 right.style.gap = '8px';
@@ -1010,8 +748,6 @@
                 }
                 scale = best;
                 setScale(scale);
-            } else {
-                setScale(1);
             }
 
             // reparto del sobrante entre secciones: sin huecos gigantes ni cortes
@@ -1060,28 +796,9 @@
             }, 400);
         }
 
-        function restoreSettings() {
-            const settings = window.__RESUME_STATE__ || getSettings();
-            const root = document.documentElement;
-            const select = document.getElementById('page-size-select');
-            if (select) select.value = PAGE_SIZES[settings.pageSize] ? settings.pageSize : 'a4';
-            autoFit = settings.autoFit !== false;
-            const toggle = document.getElementById('auto-fit-toggle');
-            if (toggle) toggle.checked = autoFit;
-            if (settings.baseLeft) root.style.setProperty('--base-left-size', settings.baseLeft + 'px');
-            if (settings.baseRight) root.style.setProperty('--base-right-size', settings.baseRight + 'px');
-            if (settings.baseHeading) root.style.setProperty('--base-heading-size', settings.baseHeading + 'px');
-            if (settings.accent) {
-                root.style.setProperty('--primary-accent', settings.accent);
-                root.style.setProperty('--heading-bg', settings.accent);
-            }
-            if (settings.bgLeft) document.getElementById('col-left').style.backgroundColor = settings.bgLeft;
-            if (settings.bgRight) document.getElementById('col-right').style.backgroundColor = settings.bgRight;
-        }
-
         function initTemplate() {
-            restoreSettings();
-            setPageSize(currentPageSize());
+            applyPageSize();
+            loadDataFromUrl();
 
             // cualquier cambio de contenido (edición, altas, bajas) recalcula el ajuste
             const paper = document.querySelector('.cv-paper');
@@ -1109,21 +826,278 @@
             document.fonts.ready.then(applyFit);
         }
 
+/* ================================================================
+           DATOS EN JSON: la hoja se puede llenar desde fuera, por ejemplo
+           por una IA ( ?datos=<JSON> o ?datos=<URL de un JSON> ).
+           ================================================================ */
+        const txt = el => el ? String(el.textContent !== undefined ? el.textContent : el).replace(/\s+/g, ' ').trim() : '';
+
+        function collectData() {
+            const items = (container, selector) => [...container.querySelectorAll(selector)]
+                .map(el => txt(el)).filter(Boolean);
+            const h1 = document.querySelector('#col-left h1');
+            let nombre = '';
+            let apellido = '';
+            if (h1) {
+                const clone = h1.cloneNode(true);
+                const span = clone.querySelector('.accent-color');
+                if (span) { apellido = txt(span); span.remove(); }
+                nombre = txt(clone);
+            }
+            return {
+                nombre: nombre,
+                apellido: apellido,
+                profesion: txt(document.querySelector('#col-left .accent-badge span')),
+                foto: (document.getElementById('profile-img') || {}).src || '',
+                contacto: [...document.querySelectorAll('#col-left ul li')].map(li => {
+                    const spans = li.querySelectorAll('span');
+                    return { etiqueta: txt(spans[0]), valor: txt(spans[1]) };
+                }).filter(c => c.etiqueta || c.valor),
+                perfil: txt(document.querySelector('#col-left p.text-justify')),
+                habilidades: items(document.getElementById('skills-list'), 'li'),
+                intereses: items(document.getElementById('interests-list'), 'div.editable-item'),
+                experiencia: [...document.querySelectorAll('#experience-container > .editable-item')].map(item => ({
+                    cargo: txt(item.querySelector('h3')),
+                    empresa: txt(item.querySelector('p.accent-color')),
+                    fecha: txt(item.querySelector('span.text-\\[0\\.6rem\\]')),
+                    descripcion: txt(item.querySelector('p.text-slate-600'))
+                })),
+                educacion: [...document.querySelectorAll('#education-container > .editable-item')].map(item => ({
+                    titulo: txt(item.querySelector('h3')),
+                    institucion: txt(item.querySelector('p.text-slate-600')),
+                    anio: txt(item.querySelector('span.text-\\[0\\.6rem\\]'))
+                })),
+                cursos: items(document.getElementById('courses-list'), 'div.editable-item'),
+                referencias: [...document.querySelectorAll('#references-container > .editable-item')].map(item => ({
+                    nombre: txt(item.querySelector('h4')),
+                    cargo: txt(item.querySelector('p:not(.accent-color)')),
+                    telefono: txt(item.querySelector('p.accent-color'))
+                }))
+            };
+        }
+
+        function fillList(container, selector, template, values) {
+            if (!container || !Array.isArray(values)) return;
+            container.innerHTML = '';
+            values.forEach(value => {
+                const item = document.createElement('div');
+                item.className = template.className;
+                item.innerHTML = template.innerHTML;
+                container.appendChild(item);
+                const target = item.querySelector(selector);
+                if (target) target.textContent = value;
+            });
+        }
+
+        function applyData(data) {
+            if (!data || typeof data !== 'object') return false;
+            const h1 = document.querySelector('#col-left h1');
+            if (h1 && (data.nombre || data.apellido)) {
+                h1.innerHTML = (data.nombre || '') + '<br><span class="accent-color">' + (data.apellido || '') + '</span>';
+            }
+            const badge = document.querySelector('#col-left .accent-badge span');
+            if (badge && data.profesion) badge.textContent = data.profesion;
+            const img = document.getElementById('profile-img');
+            if (img && data.foto) img.src = data.foto;
+
+            const contactList = document.querySelector('#col-left ul');
+            if (contactList && Array.isArray(data.contacto) && data.contacto.length) {
+                const template = contactList.querySelector('li');
+                contactList.innerHTML = '';
+                data.contacto.forEach(c => {
+                    const li = document.createElement('li');
+                    li.innerHTML = template.innerHTML;
+                    const spans = li.querySelectorAll('span');
+                    if (spans[0]) spans[0].textContent = c.etiqueta || '';
+                    if (spans[1]) spans[1].textContent = c.valor || '';
+                    contactList.appendChild(li);
+                });
+            }
+
+            const perfil = document.querySelector('#col-left p.text-justify');
+            if (perfil && data.perfil) perfil.textContent = data.perfil;
+
+            const skills = document.getElementById('skills-list');
+            if (skills && Array.isArray(data.habilidades)) {
+                const template = skills.querySelector('li');
+                skills.innerHTML = '';
+                data.habilidades.forEach(value => {
+                    const li = document.createElement('li');
+                    li.className = template.className;
+                    li.innerHTML = template.innerHTML;
+                    li.querySelector('span').textContent = value;
+                    skills.appendChild(li);
+                });
+            }
+
+            const interests = document.getElementById('interests-list');
+            if (interests && Array.isArray(data.intereses)) {
+                const template = interests.querySelector('div.editable-item');
+                interests.innerHTML = '';
+                data.intereses.forEach(value => {
+                    const div = document.createElement('div');
+                    div.className = template.className;
+                    div.innerHTML = template.innerHTML;
+                    div.querySelector('span').textContent = value;
+                    interests.appendChild(div);
+                });
+            }
+
+            const exp = document.getElementById('experience-container');
+            if (exp && Array.isArray(data.experiencia) && data.experiencia.length) {
+                const template = exp.querySelector('.editable-item');
+                exp.innerHTML = '';
+                data.experiencia.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = template.className;
+                    div.innerHTML = template.innerHTML;
+                    const h3 = div.querySelector('h3');
+                    const spanFecha = div.querySelector('span.text-\\[0\\.6rem\\]');
+                    const pEmpresa = div.querySelector('p.accent-color');
+                    const pDesc = div.querySelector('p.text-slate-600');
+                    if (h3) h3.textContent = item.cargo || '';
+                    if (spanFecha) spanFecha.textContent = item.fecha || '';
+                    if (pEmpresa) pEmpresa.textContent = item.empresa || '';
+                    if (pDesc) pDesc.textContent = item.descripcion || '';
+                    exp.appendChild(div);
+                });
+            }
+
+            const edu = document.getElementById('education-container');
+            if (edu && Array.isArray(data.educacion) && data.educacion.length) {
+                const template = edu.querySelector('.editable-item');
+                edu.innerHTML = '';
+                data.educacion.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = template.className;
+                    div.innerHTML = template.innerHTML;
+                    const h3 = div.querySelector('h3');
+                    const spanAnio = div.querySelector('span.text-\\[0\\.6rem\\]');
+                    const pInst = div.querySelector('p.text-slate-600');
+                    if (h3) h3.textContent = item.titulo || '';
+                    if (spanAnio) spanAnio.textContent = item.anio || '';
+                    if (pInst) pInst.textContent = item.institucion || '';
+                    edu.appendChild(div);
+                });
+            }
+
+            const courses = document.getElementById('courses-list');
+            if (courses && Array.isArray(data.cursos)) {
+                const template = courses.querySelector('div.editable-item');
+                courses.innerHTML = '';
+                data.cursos.forEach(value => {
+                    const div = document.createElement('div');
+                    div.className = template.className;
+                    div.innerHTML = template.innerHTML;
+                    div.querySelector('span').textContent = value;
+                    courses.appendChild(div);
+                });
+            }
+
+            const refs = document.getElementById('references-container');
+            if (refs && Array.isArray(data.referencias) && data.referencias.length) {
+                const template = refs.querySelector('.editable-item');
+                refs.innerHTML = '';
+                data.referencias.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = template.className;
+                    div.innerHTML = template.innerHTML;
+                    const h4 = div.querySelector('h4');
+                    const ps = div.querySelectorAll('p');
+                    if (h4) h4.textContent = item.nombre || '';
+                    if (ps[0]) ps[0].textContent = item.cargo || '';
+                    if (ps[1]) ps[1].textContent = item.telefono || '';
+                    refs.appendChild(div);
+                });
+            }
+
+            applyFit();
+            return true;
+        }
+
+        function toggleModalDatos(show) {
+            const modal = document.getElementById('modal-datos');
+            if (!modal) return;
+            if (show) {
+                const area = document.getElementById('datos-json');
+                if (area) area.value = JSON.stringify(collectData(), null, 2);
+                const error = document.getElementById('datos-error');
+                if (error) error.classList.add('hidden');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function aplicarDatos() {
+            const area = document.getElementById('datos-json');
+            const error = document.getElementById('datos-error');
+            if (!area) return;
+            let data;
+            try {
+                data = JSON.parse(area.value);
+            } catch (e) {
+                if (error) {
+                    error.textContent = 'El JSON no es válido: ' + e.message;
+                    error.classList.remove('hidden');
+                }
+                return;
+            }
+            applyData(data);
+            if (error) error.classList.add('hidden');
+            toggleModalDatos(false);
+        }
+
+        function copiarDatos() {
+            const area = document.getElementById('datos-json');
+            if (!area) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(area.value);
+            } else {
+                area.select();
+                document.execCommand('copy');
+            }
+            const button = event && event.target ? event.target : null;
+            if (button) {
+                const original = button.textContent;
+                button.textContent = '¡Copiado!';
+                setTimeout(() => { button.textContent = original; }, 1200);
+            }
+        }
+
+        /* Atajo: Ctrl+Shift+D abre los datos en JSON */
+        document.addEventListener('keydown', event => {
+            if (event.ctrlKey && event.shiftKey && (event.key === 'D' || event.key === 'd')) {
+                event.preventDefault();
+                toggleModalDatos(true);
+            }
+        });
+
+        /* Lee los datos de la URL: ?datos=<JSON> o ?datos=<URL de un JSON> */
+        function loadDataFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const raw = params.get('datos');
+            if (!raw) return;
+            let data = null;
+            try {
+                data = JSON.parse(raw);
+            } catch (e) {
+                if (/^https?:\/\//i.test(raw)) {
+                    fetch(raw)
+                        .then(response => response.json())
+                        .then(json => { applyData(json); })
+                        .catch(() => { /* el archivo remoto no se pudo leer */ });
+                }
+                return;
+            }
+            applyData(data);
+        }
+
         /* FUNCIÓN CLAVE PARA EXPORTAR UN FICHERO HTML COMPLETO Y FUNCIONAL */
         function exportHTMLFile() {
-            const state = {
-                pageSize: currentPageSize(),
-                baseLeft: getBaseSize('--base-left-size', 13),
-                baseRight: getBaseSize('--base-right-size', 14),
-                baseHeading: getBaseSize('--base-heading-size', 11),
-                accent: getComputedStyle(document.documentElement).getPropertyValue('--primary-accent').trim(),
-                bgLeft: document.getElementById('col-left').style.backgroundColor,
-                bgRight: document.getElementById('col-right').style.backgroundColor,
-                autoFit: autoFit
-            };
-            const injected = '<scr' + 'ipt>window.__RESUME_STATE__=' + JSON.stringify(state) + ';</scr' + 'ipt>';
-            const fullContent = '<!DOCTYPE html>\n'
-                + document.documentElement.outerHTML.replace('<head>', '<head>\n' + injected);
+            const fullContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
             const blob = new Blob([fullContent], { type: 'text/html;charset=utf-8' });
             const downloadLink = document.createElement('a');
             downloadLink.href = URL.createObjectURL(blob);
