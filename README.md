@@ -7,12 +7,14 @@ botones: guardar e imprimir.
 
 ## Cómo funciona
 
-- **Una sola hoja, siempre.** La letra base es fija (13 px la columna izquierda, 14 px la
-  derecha, 11 px los títulos) y **nunca crece**: si el contenido no cabe, se reduce (hasta
-  el 45 %) hasta que entra. No hay porcentajes ni amplifyaciones: la letra es la que es.
+- **Una sola hoja, siempre, y la letra se acomoda sola.** La letra base es de 13 px
+  (columna izquierda), 14 px (derecha) y 11 px (títulos), pero el ajuste la **escala
+  dinámicamente entre 30 % y 125 %** hasta que el contenido llena exactamente la hoja:
+  crece si sobra espacio, baja si el contenido es largo. Así la hoja queda siempre llena y
+  nada se desborda.
 - **La hoja no crece.** El alto de la hoja, de la rejilla y de las columnas es fijo, y
-  **cada sección tiene un alto máximo**: si una se pasa de largo, se recorta dentro de ella
-  (sin empujar a las demás) y el indicador de la barra avisa `⚠ Revisa el contenido`.
+  **cada sección tiene un alto máximo**: si aun así una sección se pasa de largo, se
+  recorta dentro de ella, sin empujar a las demás.
 - **Secciones fijas, de arriba hacia abajo, ordenadas por importancia:**
   - Izquierda: foto y nombre · Contacto · Perfil profesional · Habilidades · Intereses
   - Derecha: Experiencia profesional · Educación · Cursos y certificaciones · Referencias
