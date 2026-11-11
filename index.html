@@ -30,11 +30,22 @@
             --heading-bg: #0284c7;
             --badge-bg: #e0f2fe;
             --badge-text: #0369a1;
+            /* Tamaño de hoja: lo cambia la barra de herramientas (A4, Oficio o Carta) */
+            --page-w: 210mm;
+            --page-h: 297mm;
+            /* Tamaños base del CV; el ajuste automático los escala para que todo quepa en 1 hoja */
+            --base-left-size: 13px;
+            --base-right-size: 14px;
+            --base-heading-size: 11px;
+            --fit-scale: 1;
             --heading-font-size: 11px;
+            /* Separación vertical entre secciones de una columna */
+            --col-gap: 10px;
         }
 
+        /* La regla definitiva se inyecta desde JS según el tamaño de hoja elegido */
         @page {
-            size: A4 portrait;
+            size: 210mm 297mm;
             margin: 0;
         }
         
@@ -53,11 +64,11 @@
             font-size: 13px !important;
         }
 
-        /* Dimensiones A4 Rígidas de 1 sola página */
+        /* Hoja de una sola página: el tamaño real lo fijan --page-w y --page-h */
         .cv-paper {
-            width: 210mm;
-            height: 297mm;
-            max-height: 297mm;
+            width: var(--page-w, 210mm);
+            height: var(--page-h, 297mm);
+            max-height: var(--page-h, 297mm);
             background: #ffffff;
             margin: 0 auto;
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
@@ -79,12 +90,13 @@
             overflow: hidden;
         }
 
-        /* Distribución Vertical Justificada */
+        /* Distribución vertical controlada: JS reparte el espacio sobrante sin dejar huecos gigantes */
         .column-box {
             display: flex !important;
             flex-direction: column !important;
             height: 100% !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
+            gap: var(--col-gap, 10px);
             transition: background-color 0.2s ease;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -93,8 +105,11 @@
             padding: 4px;
         }
 
-        #col-left { font-size: 13px; background-color: #ffffff; }
-        #col-right { font-size: 14px; background-color: #ffffff; }
+        /* Las secciones nunca se comprimen: si no caben, el ajuste reduce la letra */
+        .column-box > * { flex-shrink: 0; }
+
+        #col-left { font-size: calc(var(--base-left-size, 13px) * var(--fit-scale, 1)); background-color: #ffffff; }
+        #col-right { font-size: calc(var(--base-right-size, 14px) * var(--fit-scale, 1)); background-color: #ffffff; }
 
         /* Adaptación de clases tipográficas */
         .cv-paper .text-xl { font-size: 1.3em !important; }
@@ -137,7 +152,7 @@
             color: #ffffff;
             padding: 3px 6px;
             border-radius: 4px;
-            font-size: var(--heading-font-size, 11px) !important;
+            font-size: calc(var(--base-heading-size, 11px) * var(--fit-scale, 1)) !important;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -166,12 +181,12 @@
             transform-origin: center center;
         }
 
-        /* Impresión A4 Exacta */
+        /* Impresión exacta: la hoja es la que se haya elegido */
         @media print {
             html, body {
-                width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
+                width: var(--page-w, 210mm) !important;
+                height: var(--page-h, 297mm) !important;
+                max-height: var(--page-h, 297mm) !important;
                 overflow: hidden !important;
                 background: #ffffff !important;
                 padding: 0 !important;
@@ -181,9 +196,9 @@
             .cv-paper {
                 box-shadow: none !important;
                 border: none !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                max-height: 297mm !important;
+                width: var(--page-w, 210mm) !important;
+                height: var(--page-h, 297mm) !important;
+                max-height: var(--page-h, 297mm) !important;
                 padding: 0.5cm 0.7cm !important;
                 overflow: hidden !important;
                 page-break-after: avoid !important;
@@ -209,14 +224,14 @@
             .section-header {
                 background-color: var(--heading-bg) !important;
                 color: #ffffff !important;
-                font-size: var(--heading-font-size, 11px) !important;
+                font-size: calc(var(--base-heading-size, 11px) * var(--fit-scale, 1)) !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
         }
     </style>
 </head>
-    <div class="hidden md:flex flex-wrap gap-[10px] text-[9px] p-5 font-sans bg-[#f8f9fa] border border-[#e9ecef] rounded-[12px] max-w-[58%] select-none justify-self-center my-5 mx-5" 
+    <div id="panel-iconos" class="no-print hidden md:flex flex-wrap gap-[10px] text-[9px] p-5 font-sans bg-[#f8f9fa] border border-[#e9ecef] rounded-[12px] max-w-[58%] select-none justify-self-center my-5 mx-5" 
      onclick="if(event.target.tagName === 'SPAN') { 
     navigator.clipboard.writeText(event.target.innerText.trim()); 
     const el = event.target; 
@@ -289,31 +304,47 @@
         </button>
 
         <div class="flex flex-wrap items-center gap-2">
+            <!-- TAMAÑO DE HOJA, AJUSTE AUTOMÁTICO Y ESTADO -->
+            <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
+                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-file-lines text-sky-400 mr-1"></i>Hoja:</span>
+                <select id="page-size-select" onchange="setPageSize(this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
+                    <option value="a4" selected>A4 (210 × 297 mm)</option>
+                    <option value="oficio">Oficio (216 × 356 mm)</option>
+                    <option value="carta">Carta (216 × 279 mm)</option>
+                </select>
+                <label class="flex items-center gap-1 text-[11px] text-slate-400 px-1 font-medium cursor-pointer" title="Ajusta la letra automáticamente para que todo el contenido quepa en una sola hoja">
+                    <input type="checkbox" id="auto-fit-toggle" onchange="setAutoFit(this.checked)" checked class="accent-sky-500 cursor-pointer">
+                    Auto
+                </label>
+                <span id="fit-status" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Estado del ajuste a una sola página">1 página</span>
+                <button onclick="resetSettings()" class="bg-slate-900 hover:bg-slate-700 text-slate-400 text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Volver a los valores por defecto">Restablecer</button>
+                <button onclick="toggleIconsPanel()" class="bg-slate-900 hover:bg-slate-700 text-slate-400 text-[11px] font-bold px-2 py-0.5 rounded border border-slate-700 transition" title="Mostrar u ocultar el catálogo de iconos">Iconos</button>
+            </div>
+
             <!-- Tamaños de Letra Texto -->
             <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1">
-                <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-font text-sky-400 mr-1"></i>Izq:</span>
+                <span class="text-[11px] text-slate-400 px-1 font-medium" title="Tamaño base de la letra; el ajuste automático lo escala"><i class="fa-solid fa-font text-sky-400 mr-1"></i>Izq:</span>
                 <select onchange="setColumnFontSize('col-left', this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
                     <option value="11">11px</option>
                     <option value="12">12px</option>
-                    <option value="13">13px</option>
+                    <option value="13" selected>13px</option>
                     <option value="14">14px</option>
                     <option value="16">16px</option>
-                    <option value="18" selected>18px</option>
+                    <option value="18">18px</option>
                     <option value="20">20px</option>
                     <option value="22">22px</option>
                     <option value="24">24px</option>
                     <option value="26">26px</option>
-                    
                 </select>
                 <span class="text-[11px] text-slate-400 px-1 font-medium">Der:</span>
                 <select onchange="setColumnFontSize('col-right', this.value)" class="bg-slate-900 text-slate-200 text-xs font-semibold px-1.5 py-0.5 rounded border border-slate-700 focus:outline-none cursor-pointer">
                     <option value="11">11px</option>
                     <option value="12">12px</option>
                     <option value="13">13px</option>
-                    <option value="14">14px</option>
+                    <option value="14" selected>14px</option>
                     <option value="15">15px</option>
                     <option value="16">16px</option>
-                    <option value="18" selected>18px</option>
+                    <option value="18">18px</option>
                     <option value="20">20px</option>
                     <option value="22">22px</option>
                     <option value="24">24px</option>
@@ -334,7 +365,7 @@
                     <option value="15">15 px</option>
                     <option value="16">16px</option>
                     <option value="18">18px</option>
-                    <option value="20" selected>20px</option>
+                    <option value="11" selected>11px</option>
                     <option value="22">22px</option>
                     <option value="24">24px</option>
                     <option value="26">26px</option>
@@ -388,7 +419,7 @@
             <!-- COLOR DE ACENTO -->
             <div class="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700 gap-1.5">
                 <span class="text-[11px] text-slate-400 px-1 font-medium"><i class="fa-solid fa-palette text-sky-400 mr-1"></i>Acento:</span>
-                <input type="color" value="#0284c7" onchange="setCustomAccentColor(this.value)" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent">
+                <input type="color" id="accent-color" value="#0284c7" onchange="setCustomAccentColor(this.value)" class="w-6 h-6 rounded cursor-pointer border-0 bg-transparent">
             </div>
 
             <!-- ACCIONES -->
@@ -678,20 +709,29 @@
         }
 
         function setColumnFontSize(colId, sizePx) {
-            document.getElementById(colId).style.fontSize = sizePx + 'px';
+            const varName = colId === 'col-left' ? '--base-left-size' : '--base-right-size';
+            document.documentElement.style.setProperty(varName, sizePx + 'px');
+            saveSettings();
+            applyFit();
         }
 
         function setHeadingFontSize(sizePx) {
-            document.documentElement.style.setProperty('--heading-font-size', sizePx + 'px');
+            document.documentElement.style.setProperty('--base-heading-size', sizePx + 'px');
+            saveSettings();
+            applyFit();
         }
 
         function setColumnBgColor(colId, color) {
             document.getElementById(colId).style.backgroundColor = color;
+            saveSettings();
         }
 
         function setCustomAccentColor(color) {
             document.documentElement.style.setProperty('--primary-accent', color);
             document.documentElement.style.setProperty('--heading-bg', color);
+            const picker = document.getElementById('accent-color');
+            if (picker) picker.value = color;
+            saveSettings();
         }
 
         function triggerPhotoUpload() {
@@ -830,9 +870,260 @@
             container.appendChild(newItem);
         }
     
+        /* ================================================================
+           AJUSTE AUTOMÁTICO A UNA SOLA HOJA
+           Escala la letra para que TODO el contenido quepa en la hoja
+           elegida y reparte el espacio sobrante entre las secciones.
+           ================================================================ */
+        const PAGE_SIZES = {
+            a4:     { w: '210mm',   h: '297mm' },
+            oficio: { w: '215.9mm', h: '355.6mm' },
+            carta:  { w: '215.9mm', h: '279.4mm' }
+        };
+        const FIT_MIN = 0.55;  // hasta dónde se puede reducir la letra
+        const FIT_MAX = 1.45;  // hasta dónde se puede ampliar para llenar la hoja
+        const SETTINGS_KEY = 'resume-basic-template';
+
+        let autoFit = true;
+        let fitTimer = null;
+
+        function getSettings() {
+            try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; }
+            catch (e) { return {}; }
+        }
+
+        function getBaseSize(varName, fallback) {
+            const value = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(varName));
+            return isNaN(value) ? fallback : value;
+        }
+
+        function saveSettings() {
+            try {
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+                    pageSize: currentPageSize(),
+                    baseLeft: getBaseSize('--base-left-size', 13),
+                    baseRight: getBaseSize('--base-right-size', 14),
+                    baseHeading: getBaseSize('--base-heading-size', 11),
+                    accent: getComputedStyle(document.documentElement).getPropertyValue('--primary-accent').trim(),
+                    bgLeft: document.getElementById('col-left').style.backgroundColor,
+                    bgRight: document.getElementById('col-right').style.backgroundColor,
+                    autoFit: autoFit
+                }));
+            } catch (e) { /* modo privado: se guarda solo en memoria */ }
+        }
+
+        function currentPageSize() {
+            const select = document.getElementById('page-size-select');
+            return select && PAGE_SIZES[select.value] ? select.value : 'a4';
+        }
+
+        function setPageSize(key) {
+            const size = PAGE_SIZES[key] || PAGE_SIZES.a4;
+            const root = document.documentElement;
+            const select = document.getElementById('page-size-select');
+            if (select && select.value !== key) select.value = key;
+            root.style.setProperty('--page-w', size.w);
+            root.style.setProperty('--page-h', size.h);
+            // @page no admite variables CSS: se inyecta la regla definitiva
+            let rule = document.getElementById('page-rule');
+            if (!rule) {
+                rule = document.createElement('style');
+                rule.id = 'page-rule';
+                document.head.appendChild(rule);
+            }
+            rule.textContent = '@page { size: ' + size.w + ' ' + size.h + '; margin: 0; }';
+            saveSettings();
+            applyFit();
+        }
+
+        function setAutoFit(enabled) {
+            autoFit = enabled;
+            saveSettings();
+            applyFit();
+        }
+
+        function resetSettings() {
+            try { localStorage.removeItem(SETTINGS_KEY); } catch (e) { /* sin almacenamiento */ }
+            location.reload();
+        }
+
+        function toggleIconsPanel() {
+            const panel = document.getElementById('panel-iconos');
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+        }
+
+        /* Alto real del contenido de una columna.
+           Los hijos se miden sin compresión: si el ajuste falla, el aviso sale de aquí. */
+        function measureContent(col) {
+            const kids = [...col.children];
+            const previous = kids.map(kid => kid.style.flexShrink);
+            kids.forEach(kid => { kid.style.flexShrink = '0'; });
+            const gap = parseFloat(getComputedStyle(col).rowGap) || 0;
+            const sum = kids.reduce((acc, kid) => acc + kid.offsetHeight, 0);
+            kids.forEach((kid, i) => { kid.style.flexShrink = previous[i]; });
+            return sum + gap * Math.max(kids.length - 1, 0);
+        }
+
+        /* Alto que ocupan las secciones de una columna */
+        function columnContentHeight(col) {
+            return measureContent(col);
+        }
+
+        function fitScaleFor(col) {
+            return col.clientHeight / Math.max(measureContent(col), 1);
+        }
+
+        /* Escala la letra y reparte el espacio sobrante: nada se sale de la hoja */
+        function applyFit() {
+            const left = document.getElementById('col-left');
+            const right = document.getElementById('col-right');
+            if (!left || !right) return;
+            const root = document.documentElement;
+            // sin layout listo no se mide nada (evita ajustes con alturas en cero)
+            if (left.clientHeight < 50 || right.clientHeight < 50) return;
+
+            const setScale = value => root.style.setProperty('--fit-scale', value);
+            const gapOf = col => parseFloat(getComputedStyle(col).rowGap) || 0;
+            const contentOf = col => measureContent(col);
+            const sumOf = col => {
+                const kids = [...col.children];
+                return measureContent(col) - gapOf(col) * Math.max(kids.length - 1, 0);
+            };
+            // ¿cabe el contenido de las dos columnas en la altura disponible?
+            const fits = () => contentOf(left) <= left.clientHeight + 0.5
+                && contentOf(right) <= right.clientHeight + 0.5;
+
+            let scale = 1;
+            if (autoFit) {
+                // medición estable: hueco mínimo mientras se busca la escala
+                left.style.gap = '8px';
+                right.style.gap = '8px';
+
+                let lo = FIT_MIN;
+                let hi = FIT_MAX;
+                let best = FIT_MIN;
+                for (let i = 0; i < 8; i++) {
+                    const mid = (lo + hi) / 2;
+                    setScale(mid);
+                    if (fits()) { best = mid; lo = mid; } else { hi = mid; }
+                }
+                scale = best;
+                setScale(scale);
+            } else {
+                setScale(1);
+            }
+
+            // reparto del sobrante entre secciones: sin huecos gigantes ni cortes
+            [left, right].forEach(col => {
+                const children = [...col.children];
+                if (children.length < 2) { col.style.gap = '0px'; return; }
+                const free = col.clientHeight - sumOf(col);
+                const maxGap = free / (children.length - 1);
+                const gap = Math.min(Math.max(maxGap, 8), 26);
+                col.style.gap = gap + 'px';
+            });
+
+            updateFitStatus(scale);
+        }
+
+        function updateFitStatus(scale) {
+            const badge = document.getElementById('fit-status');
+            if (!badge) return;
+            const left = document.getElementById('col-left');
+            const right = document.getElementById('col-right');
+            const leftUsed = measureContent(left);
+            const rightUsed = measureContent(right);
+            const overflows = leftUsed > left.clientHeight + 0.5
+                || rightUsed > right.clientHeight + 0.5;
+            badge.title = 'Izq: ' + Math.round(leftUsed) + ' de ' + left.clientHeight + ' px · '
+                + 'Der: ' + Math.round(rightUsed) + ' de ' + right.clientHeight + ' px · '
+                + 'Escala: ' + Math.round(scale * 100) + '%';
+            if (overflows) {
+                badge.textContent = '⚠ No cabe en 1 hoja';
+                badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30';
+            } else {
+                badge.textContent = '1 hoja · ' + Math.round(scale * 100) + '%';
+                badge.className = 'text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+            }
+        }
+
+        function scheduleFit() {
+            clearTimeout(fitTimer);
+            fitTimer = setTimeout(() => {
+                // dos frames para que el layout se asiente antes de medir
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    applyFit();
+                    // segunda pasada: Tailwind y las fuentes pueden cambiar el alto después
+                    setTimeout(applyFit, 400);
+                }));
+            }, 400);
+        }
+
+        function restoreSettings() {
+            const settings = window.__RESUME_STATE__ || getSettings();
+            const root = document.documentElement;
+            const select = document.getElementById('page-size-select');
+            if (select) select.value = PAGE_SIZES[settings.pageSize] ? settings.pageSize : 'a4';
+            autoFit = settings.autoFit !== false;
+            const toggle = document.getElementById('auto-fit-toggle');
+            if (toggle) toggle.checked = autoFit;
+            if (settings.baseLeft) root.style.setProperty('--base-left-size', settings.baseLeft + 'px');
+            if (settings.baseRight) root.style.setProperty('--base-right-size', settings.baseRight + 'px');
+            if (settings.baseHeading) root.style.setProperty('--base-heading-size', settings.baseHeading + 'px');
+            if (settings.accent) {
+                root.style.setProperty('--primary-accent', settings.accent);
+                root.style.setProperty('--heading-bg', settings.accent);
+            }
+            if (settings.bgLeft) document.getElementById('col-left').style.backgroundColor = settings.bgLeft;
+            if (settings.bgRight) document.getElementById('col-right').style.backgroundColor = settings.bgRight;
+        }
+
+        function initTemplate() {
+            restoreSettings();
+            setPageSize(currentPageSize());
+
+            // cualquier cambio de contenido (edición, altas, bajas) recalcula el ajuste
+            const paper = document.querySelector('.cv-paper');
+            if (paper && window.MutationObserver) {
+                new MutationObserver(scheduleFit).observe(paper, {
+                    childList: true,
+                    subtree: true,
+                    characterData: true
+                });
+            }
+            document.addEventListener('input', scheduleFit);
+            window.addEventListener('resize', scheduleFit);
+            window.addEventListener('beforeprint', applyFit);
+            applyFit();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initTemplate);
+        } else {
+            initTemplate();
+        }
+        // Tailwind y las fuentes se aplican después: se recalcula cuando todo está listo
+        window.addEventListener('load', () => { applyFit(); setTimeout(applyFit, 500); });
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(applyFit);
+        }
+
         /* FUNCIÓN CLAVE PARA EXPORTAR UN FICHERO HTML COMPLETO Y FUNCIONAL */
         function exportHTMLFile() {
-            const fullContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+            const state = {
+                pageSize: currentPageSize(),
+                baseLeft: getBaseSize('--base-left-size', 13),
+                baseRight: getBaseSize('--base-right-size', 14),
+                baseHeading: getBaseSize('--base-heading-size', 11),
+                accent: getComputedStyle(document.documentElement).getPropertyValue('--primary-accent').trim(),
+                bgLeft: document.getElementById('col-left').style.backgroundColor,
+                bgRight: document.getElementById('col-right').style.backgroundColor,
+                autoFit: autoFit
+            };
+            const injected = '<scr' + 'ipt>window.__RESUME_STATE__=' + JSON.stringify(state) + ';</scr' + 'ipt>';
+            const fullContent = '<!DOCTYPE html>\n'
+                + document.documentElement.outerHTML.replace('<head>', '<head>\n' + injected);
             const blob = new Blob([fullContent], { type: 'text/html;charset=utf-8' });
             const downloadLink = document.createElement('a');
             downloadLink.href = URL.createObjectURL(blob);
