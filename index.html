@@ -685,6 +685,9 @@
             const clippedLeft = capSections(left);
             const clippedRight = capSections(right);
             const clipped = clippedLeft || clippedRight;
+            // si hay sobrante, se reparte entre las secciones para llenar la hoja
+            if (!clippedLeft) distributeSpace(left);
+            if (!clippedRight) distributeSpace(right);
 
             updateFitStatus(scale, clipped);
         }
@@ -698,7 +701,7 @@
             const gap = parseFloat(styles.rowGap) || 0;
             const padding = (parseFloat(styles.paddingTop) || 0) + (parseFloat(styles.paddingBottom) || 0);
             const avail = Math.max(col.clientHeight - padding - gap * Math.max(kids.length - 1, 0), 0);
-            kids.forEach(kid => { kid.style.maxHeight = 'none'; });
+            kids.forEach(kid => { kid.style.maxHeight = 'none'; kid.style.flexGrow = '0'; });
             const natural = kids.map(kid => kid.getBoundingClientRect().height);
             const total = natural.reduce((acc, value) => acc + value, 0);
             if (total <= avail || total <= 0) {
@@ -718,6 +721,26 @@
             }
             kids.forEach((kid, i) => { kid.style.maxHeight = alloc[i] + 'px'; });
             return true;
+        }
+
+        /* Reparte el espacio sobrante entre las secciones: la letra no cambia,
+           pero la hoja se llena de arriba abajo. */
+        function distributeSpace(col) {
+            const kids = [...col.children];
+            if (kids.length < 2) return;
+            const styles = getComputedStyle(col);
+            const gap = parseFloat(styles.rowGap) || 0;
+            const padding = (parseFloat(styles.paddingTop) || 0) + (parseFloat(styles.paddingBottom) || 0);
+            const avail = Math.max(col.clientHeight - padding - gap * (kids.length - 1), 0);
+            kids.forEach(kid => { kid.style.maxHeight = 'none'; kid.style.flexGrow = '0'; });
+            const natural = kids.map(kid => kid.getBoundingClientRect().height);
+            const total = natural.reduce((acc, value) => acc + value, 0);
+            if (total <= 0 || total >= avail) {
+                kids.forEach(kid => { kid.style.flexGrow = '0'; });
+                return;
+            }
+            // el sobrante se reparte en proporcion al tamano de cada seccion
+            kids.forEach((kid, i) => { kid.style.flexGrow = String(Math.max(natural[i], 1)); });
         }
 
         /* Aviso solo cuando algo se recorta: si todo cabe, la barra queda limpia */
